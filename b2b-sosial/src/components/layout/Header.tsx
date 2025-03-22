@@ -6,9 +6,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <img src="/logo.svg" alt="B2B Social" className="h-8 w-8 mr-2" />
-          <Link href="/" className="text-xl font-bold">
-            B2B Social
-          </Link>
+          <h1 className="text-xl font-bold">B2B Social</h1>
         </div>
         <div className="hidden md:block">
           <input

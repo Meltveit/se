@@ -1,77 +1,51 @@
 import { useRouter } from "next/router";
-import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { db } from "../../lib/firebase";
-import { Business } from "../../lib/types";
-import Header from "../../components/layout/Header";
-import Footer from "../../components/layout/Footer";
+import Layout from "@/components/layout/Layout";
+import BusinessProfile from "@/components/business/BusinessProfile";
 
-export default function BusinessDetailPage() {
+interface Business {
+  name: string;
+  categories: string[];
+  email: string;
+  phone: string;
+  address: string;
+  description: string;
+  website: string;
+  contactPerson: string;
+  orgNumber: string;
+}
+
+const mockBusinesses: Record<string, Business> = {
+  "bon-as": {
+    name: "BON AS",
+    categories: ["Drikkevarer", "Distributør", "Produsent"],
+    email: "christopher@nielsenit.no",
+    phone: "95863224",
+    address: "Lensmannslia 4",
+    description: "We produce the world's best seltzer water without additives. Best in tests across the world.",
+    website: "https://www.strijana.com",
+    contactPerson: "Christopher Meltveit Nielsen",
+    orgNumber: "929783018",
+  },
+};
+
+export default function BusinessPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [business, setBusiness] = useState<Business | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    const fetchBusiness = async () => {
-      const docRef = doc(db, "businesses", id as string);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setBusiness({ id: docSnap.id, ...docSnap.data() } as Business);
-      }
-    };
-    fetchBusiness();
-  }, [id]);
+  // Find the business based on ID, otherwise show an error message
+  const business = id ? mockBusinesses[id as string] : undefined;
 
-  if (!business) return <div>Loading...</div>;
+  if (!business) {
+    return (
+      <Layout>
+        <div className="text-center text-red-500">Business not found</div>
+      </Layout>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-          <div className="h-48 bg-gradient-to-r from-blue-500 to-blue-700 relative">
-            <div className="absolute -bottom-16 left-8 w-32 h-32 bg-white rounded-full flex items-center justify-center text-blue-600 text-4xl font-bold border-4 border-white">
-              {business.name[0]}
-            </div>
-          </div>
-          <div className="p-6 pt-20">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-2xl font-bold mb-2">{business.name}</h1>
-                <div className="flex flex-wrap mb-4">
-                  {business.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mr-1 mb-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-                Send Message
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-600 mb-4">
-              <div>
-                <p className="font-medium">Email:</p>
-                <p>{business.email || "N/A"}</p>
-              </div>
-              <div>
-                <p className="font-medium">Phone:</p>
-                <p>{business.phone || "N/A"}</p>
-              </div>
-              <div>
-                <p className="font-medium">Address:</p>
-                <p>{business.address || "N/A"}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <Layout>
+      <BusinessProfile {...business} />
+    </Layout>
   );
 }

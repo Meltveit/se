@@ -1,62 +1,51 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
-import CategoryTabs from "../components/layout/CategoryTabs";
-import BusinessCard from "../components/business/BusinessCard";
-import BusinessCategories from "../components/business/BusinessCategories";
-import AdBanner from "../components/common/AdBanner";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import Layout from "@/components/layout/Layout";
+import BusinessCard from "@/components/business/BusinessCard";
+import BusinessCategories from "@/components/business/BusinessCategories";
+import CategoryTabs from "@/components/common/CategoryTabs";
+import AdBanner from "@/components/common/AdBanner";
 
-interface Business {
-  id: string;
-  name: string;
-  description: string;
-  tags: string[];
-}
+const businesses = [
+  { id: "fixitt-as", name: "Fixitt AS", tags: ["service", "webdesign"], description: "We handle all your IT needs and make life easier for you." },
+  { id: "bon-as", name: "BON AS", tags: ["beverage", "distributor"], description: "We produce the world's best seltzer water without additives." },
+  { id: "unknown", name: "Unknown Business", tags: ["Other"], description: "No description available." },
+];
 
 export default function HomePage() {
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-
-  useEffect(() => {
-    const fetchBusinesses = async () => {
-      const querySnapshot = await getDocs(collection(db, "businesses"));
-      const businessData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Business[];
-      setBusinesses(businessData);
-    };
-    fetchBusinesses();
-  }, []);
-
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        {/* Category Tabs */}
-        <CategoryTabs />
+    <Layout>
+      {/* Category Tabs - Strekker seg over hele bredden */}
+      <CategoryTabs />
 
-        {/* Featured Businesses */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Featured Businesses</h2>
-            <a href="/browse" className="text-blue-600">View All</a>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {businesses.slice(0, 3).map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </div>
+      {/* Featured Businesses */}
+      <div className="mb-12">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Featured Businesses</h1>
+          <Link href="/businesses" className="text-blue-600 hover:underline">
+            View All
+          </Link>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {businesses.map((business) => (
+            <Link key={business.id} href={`/businesses/${business.id}`}>
+              <motion.div
+                className="business-card relative"
+                whileHover={{ scale: 1.03, y: -5 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BusinessCard {...business} />
+              </motion.div>
+            </Link>
+          ))}
+        </div>
+      </div>
 
-        {/* Business Categories */}
-        <BusinessCategories />
+      {/* Business Categories */}
+      <BusinessCategories />
 
-        {/* Ad Banner */}
-        <AdBanner />
-      </main>
-      <Footer />
-    </div>
+      {/* Ad Banner */}
+      <AdBanner />
+    </Layout>
   );
 }

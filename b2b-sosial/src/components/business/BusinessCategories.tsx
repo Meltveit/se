@@ -1,11 +1,19 @@
+import Link from "next/link";
+import { motion } from "framer-motion";
+
 export default function BusinessCategories() {
-    return (
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4">Business Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Technology */}
-          <div className="bg-white p-4 rounded-lg shadow-md text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+  return (
+    <div className="mb-12">
+      <h2 className="text-2xl font-bold mb-6">Business Categories</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {/* Technology */}
+        <Link href="/categories/technology">
+          <motion.div
+            className="category-card bg-white p-6 rounded-lg shadow-lg text-center"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-blue-600"
@@ -21,11 +29,18 @@ export default function BusinessCategories() {
                 />
               </svg>
             </div>
-            <h3 className="font-medium">Technology</h3>
-          </div>
-          {/* Finance */}
-          <div className="bg-white p-4 rounded-lg shadow-md text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <h3 className="font-medium text-gray-800">Technology</h3>
+          </motion.div>
+        </Link>
+
+        {/* Finance */}
+        <Link href="/categories/finance">
+          <motion.div
+            className="category-card bg-white p-6 rounded-lg shadow-lg text-center"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-green-600"
@@ -41,11 +56,18 @@ export default function BusinessCategories() {
                 />
               </svg>
             </div>
-            <h3 className="font-medium">Finance</h3>
-          </div>
-          {/* Marketing */}
-          <div className="bg-white p-4 rounded-lg shadow-md text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <h3 className="font-medium text-gray-800">Finance</h3>
+          </motion.div>
+        </Link>
+
+        {/* Marketing */}
+        <Link href="/categories/marketing">
+          <motion.div
+            className="category-card bg-white p-6 rounded-lg shadow-lg text-center"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-purple-600"
@@ -61,11 +83,18 @@ export default function BusinessCategories() {
                 />
               </svg>
             </div>
-            <h3 className="font-medium">Marketing</h3>
-          </div>
-          {/* Health */}
-          <div className="bg-white p-4 rounded-lg shadow-md text-center">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+            <h3 className="font-medium text-gray-800">Marketing</h3>
+          </motion.div>
+        </Link>
+
+        {/* Health */}
+        <Link href="/categories/health">
+          <motion.div
+            className="category-card bg-white p-6 rounded-lg shadow-lg text-center"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-red-600"
@@ -81,9 +110,10 @@ export default function BusinessCategories() {
                 />
               </svg>
             </div>
-            <h3 className="font-medium">Health</h3>
-          </div>
-        </div>
+            <h3 className="font-medium text-gray-800">Health</h3>
+          </motion.div>
+        </Link>
       </div>
-    );
-  }
+    </div>
+  );
+}

@@ -1,5 +1,10 @@
-@import "tailwindcss";
+@tailwind base;
 
+@tailwind components;
+
+@tailwind utilities;
+
+/* Your custom styles below */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -16,4 +21,33 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+.business-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.business-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+  font-family: 'Inter', sans-serif; /* Moderne skrifttype */
+}
+
+button.bg-blue-600 {
+  background: linear-gradient(90deg, #2563eb, #3b82f6); /* Gradient for knapper */
+}
+
+button.bg-blue-600:hover {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
 }
