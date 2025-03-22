@@ -1,5 +1,5 @@
 PROSJEKTSTRUKTUR OG KODEINNHOLD
-Generert: 22.03.2025 kl. 00:18:32
+Generert: 22.03.2025 kl. 12:40:33
 ================================================================================
 
 MAPPESTRUKTUR OG KODEINNHOLD FOR: C:\bconnect\se\b2b-sosial\src
