@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import AdBanner from './AdBanner';
 
@@ -16,7 +18,7 @@ interface AdPlacementProps {
 
 const AdPlacement: React.FC<AdPlacementProps> = ({ type, className = '' }) => {
   // Configuration for different ad placements
-  const adConfig: Record<
+  const adConfig: Record
     AdPlacementType, 
     { adSlot: string; width: number; height: number; format: 'auto' | 'rectangle' | 'horizontal' | 'vertical' }
   > = {

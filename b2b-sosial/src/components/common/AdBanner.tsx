@@ -1,4 +1,13 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
+
+// Add TypeScript declaration for window.adsbygoogle
+declare global {
+  interface Window {
+    adsbygoogle: any[];
+  }
+}
 
 interface AdBannerProps {
   adSlot: string;
@@ -40,8 +49,7 @@ const AdBanner: React.FC<AdBannerProps> = ({
         data-ad-slot={adSlot}
         data-ad-format={format}
         data-full-width-responsive="true"
-        ref={adRef}
-      ></ins>
+      />
     </div>
   );
 };

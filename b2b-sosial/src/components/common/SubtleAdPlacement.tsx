@@ -1,11 +1,13 @@
+"use client";
+
 import React from 'react';
 import AdBanner from './AdBanner';
 
 export type SubtleAdPlacementType = 
-  | 'content-bottom'       // Subtil annonse nederst i innhold
-  | 'sidebar-native'       // Nativ annonse i sidebar som ligner på vanlig innhold
-  | 'feed-integrated'      // Integrert annonse i feed som en naturlig del av listen
-  | 'footer-discrete';     // Diskret annonse i bunnen av siden
+  | 'content-bottom'    // Subtle ad at bottom of content
+  | 'sidebar-native'    // Native ad in sidebar resembling normal content
+  | 'feed-integrated'   // Integrated ad in feed as natural part of list
+  | 'footer-discrete';  // Discrete ad at bottom of page
 
 interface SubtleAdPlacementProps {
   type: SubtleAdPlacementType;
@@ -13,13 +15,16 @@ interface SubtleAdPlacementProps {
 }
 
 const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className = '' }) => {
-  // Konfigurasjon for ulike annonsetyper med subtil utforming
-  const adConfig: Record<
-    SubtleAdPlacementType, 
-    { adSlot: string; width: number; height: number; format: 'auto' | 'rectangle' | 'horizontal' | 'vertical'; style: React.CSSProperties }
-  > = {
+  // Configuration for different ad types with subtle styling
+  const adConfig: Record<SubtleAdPlacementType, {
+    adSlot: string;
+    width: number;
+    height: number;
+    format: 'auto' | 'rectangle' | 'horizontal' | 'vertical';
+    style: React.CSSProperties;
+  }> = {
     'content-bottom': {
-      adSlot: '1234567890', // Erstatt med din faktiske annonse-ID
+      adSlot: '1234567890', // Replace with your actual ad ID
       width: 728,
       height: 90,
       format: 'horizontal',
@@ -32,7 +37,7 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
       }
     },
     'sidebar-native': {
-      adSlot: '2345678901', // Erstatt med din faktiske annonse-ID
+      adSlot: '2345678901', // Replace with your actual ad ID
       width: 300,
       height: 250,
       format: 'rectangle',
@@ -46,7 +51,7 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
       }
     },
     'feed-integrated': {
-      adSlot: '3456789012', // Erstatt med din faktiske annonse-ID
+      adSlot: '3456789012', // Replace with your actual ad ID
       width: 468,
       height: 60,
       format: 'horizontal',
@@ -59,7 +64,7 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
       }
     },
     'footer-discrete': {
-      adSlot: '4567890123', // Erstatt med din faktiske annonse-ID
+      adSlot: '4567890123', // Replace with your actual ad ID
       width: 728,
       height: 90,
       format: 'horizontal',
@@ -67,14 +72,14 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
         margin: '10px auto',
         borderTop: '1px solid #eaeaea',
         paddingTop: '15px',
-        opacity: 0.85 // Litt mindre fremtredende
+        opacity: 0.85 // Slightly less prominent
       }
     }
   };
 
   const config = adConfig[type];
 
-  // Vis diskret placeholder i utviklingsmodus
+  // Show discrete placeholder in development mode
   if (process.env.NODE_ENV === 'development') {
     return (
       <div 
@@ -89,7 +94,7 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
           justifyContent: 'center'
         }}
       >
-        <p className="text-gray-400 text-xs">Diskret annonse</p>
+        <p className="text-gray-400 text-xs">Discrete Ad</p>
       </div>
     );
   }
