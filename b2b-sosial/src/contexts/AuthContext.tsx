@@ -1,29 +1,40 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
+import { 
+  User,
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut as firebaseSignOut
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase/config';
 import { getUserProfile, isBusinessAdmin } from '@/lib/firebase/auth';
-import { User } from '@/types';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 
 interface AuthContextType {
-  user: FirebaseUser | null;
-  userProfile: User | null;
-  isAdmin: boolean;
-  isBusinessOwner: boolean;
+  user: User | null;
+  userProfile: any | null;
   businessId: string | null;
+  isBusinessOwner: boolean;
   loading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   userProfile: null,
-  isAdmin: false,
-  isBusinessOwner: false,
   businessId: null,
+  isBusinessOwner: false,
   loading: true,
+  error: null,
+  signIn: async () => {},
+  signOut: async () => {},
+  resetPassword: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -33,76 +44,97 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isBusinessOwner, setIsBusinessOwner] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isBusinessOwner, setIsBusinessOwner] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Handle auth state changes
+  // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
       
-      if (firebaseUser) {
+      if (currentUser) {
         try {
-          // Get user profile
-          const profile = await getUserProfile(firebaseUser);
-          if (profile) {
-            setUserProfile({
-              id: firebaseUser.uid,
-              ...(profile as Omit<User, 'id'>),
-            });
-          }
+          // Get user profile from Firestore
+          const profileData = await getUserProfile(currentUser);
+          setUserProfile(profileData);
           
-          // Check if user is business admin
-          const businessAdmin = await isBusinessAdmin(firebaseUser);
-          setIsBusinessOwner(businessAdmin);
+          // Check if user is a business admin/owner
+          const businessOwner = await isBusinessAdmin(currentUser);
+          setIsBusinessOwner(businessOwner);
           
-          // If business admin, get business ID
-          if (businessAdmin) {
-            // Check if user is the owner of any business
-            const businessDoc = await getDoc(doc(db, 'businesses', firebaseUser.uid));
-            if (businessDoc.exists()) {
-              setBusinessId(businessDoc.id);
-            }
+          // If user is business owner, set businessId (which is the same as userId)
+          if (businessOwner) {
+            setBusinessId(currentUser.uid);
+          } else {
+            setBusinessId(null);
           }
-          
-          // Check if user is platform admin (for internal use)
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists() && userDoc.data().isAdmin) {
-            setIsAdmin(true);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
+        } catch (err) {
+          console.error('Error getting user profile:', err);
+          setError('Error loading user data');
         }
       } else {
-        // Reset states when user logs out
+        // Reset user state when logged out
         setUserProfile(null);
-        setIsBusinessOwner(false);
         setBusinessId(null);
-        setIsAdmin(false);
+        setIsBusinessOwner(false);
       }
       
       setLoading(false);
     });
-    
+
+    // Clean up subscription
     return () => unsubscribe();
   }, []);
+
+  // Sign in user
+  const signIn = async (email: string, password: string) => {
+    try {
+      setError(null);
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err: any) {
+      console.error('Sign in error:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Sign out user
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+    } catch (err: any) {
+      console.error('Sign out error:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Reset password
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (err: any) {
+      console.error('Reset password error:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
 
   const value = {
     user,
     userProfile,
-    isAdmin,
-    isBusinessOwner,
     businessId,
+    isBusinessOwner,
     loading,
+    error,
+    signIn,
+    signOut,
+    resetPassword,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
