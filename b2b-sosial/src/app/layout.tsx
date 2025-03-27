@@ -1,16 +1,11 @@
 import React from 'react';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastProvider } from '@/contexts/ToastContext';
-import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata = {
-  title: 'B2B Social - Connect with Businesses',
-  description: 'Connect with businesses that matter and grow your network',
-};
 
 export default function RootLayout({
   children,
@@ -30,7 +25,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <ToastProvider>
             {children}

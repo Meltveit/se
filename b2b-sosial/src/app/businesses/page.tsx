@@ -8,7 +8,7 @@ import BusinessCard from '@/components/businesses/BusinessCard';
 import BusinessFilters from '@/components/businesses/BusinessFilters';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import AdPlacement from '@/components/common/AdPlacement';
+import AdPlacement from '@/components/common/SubtleAdPlacement';
 import { Business, Category, Tag, Country, Region } from '@/types';
 
 // Mock country data - would be replaced with actual data

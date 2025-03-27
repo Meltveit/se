@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import AdBanner from './AdBanner';
 
 export type SubtleAdPlacementType = 
   | 'content-bottom'    // Subtle ad at bottom of content
@@ -77,6 +76,12 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
     }
   };
 
+  // Make sure we have a valid type
+  if (!adConfig[type]) {
+    console.error(`Invalid ad type: ${type}. Valid types are: ${Object.keys(adConfig).join(', ')}`);
+    return null; // Return nothing if the type is invalid
+  }
+
   const config = adConfig[type];
 
   // Show discrete placeholder in development mode
@@ -99,14 +104,13 @@ const SubtleAdPlacement: React.FC<SubtleAdPlacementProps> = ({ type, className =
     );
   }
 
+  // For production
   return (
     <div className={className} style={config.style}>
-      <AdBanner
-        adSlot={config.adSlot}
-        width={config.width}
-        height={config.height}
-        format={config.format}
-      />
+      {/* AdBanner component would be used here */}
+      <div style={{ width: config.width, height: config.height, maxWidth: '100%', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p className="text-gray-400 text-xs">Ad: {type}</p>
+      </div>
     </div>
   );
 };
