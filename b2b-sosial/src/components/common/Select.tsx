@@ -1,3 +1,4 @@
+// src/components/common/Select.tsx
 import React, { SelectHTMLAttributes, forwardRef } from 'react';
 
 interface Option {
@@ -57,7 +58,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             id={selectId}
-            className={`${baseSelectStyles} ${widthStyle} ${errorStyle} ${sizeStyles[size]} ${iconStyle}`}
+            className={`${baseSelectStyles} ${widthStyle} ${errorStyle} ${sizeStyles[size]} ${iconStyle} text-gray-900`}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? `${selectId}-error` : hint ? `${selectId}-hint` : undefined}
             {...rest}

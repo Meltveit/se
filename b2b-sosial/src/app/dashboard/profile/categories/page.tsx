@@ -1,3 +1,4 @@
+// src/app/dashboard/profile/categories/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -30,8 +31,6 @@ export default function CategoriesAndTagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [customTags, setCustomTags] = useState<string[]>([]);
   
   // Fetch business data, categories, and tags
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function CategoriesAndTagsPage() {
           // Set existing category and tags if available
           if (businessData.category) setSelectedCategory(businessData.category);
           if (businessData.tags && businessData.tags.length > 0) {
-            setSelectedTags(businessData.tags);
+            setSelectedTags(businessData.tags.slice(0, 3));
           }
         } else {
           setError('Business not found. Please contact support.');
@@ -75,34 +74,12 @@ export default function CategoriesAndTagsPage() {
     if (selectedTags.includes(tagId)) {
       setSelectedTags(selectedTags.filter(id => id !== tagId));
     } else {
-      if (selectedTags.length < 10) {
+      if (selectedTags.length < 3) {
         setSelectedTags([...selectedTags, tagId]);
       } else {
-        showToast('You can select up to 10 tags', 'error');
+        showToast('You can select up to 3 tags', 'error');
       }
     }
-  };
-
-  // Handle custom tag input
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
-      e.preventDefault();
-      addCustomTag();
-    }
-  };
-
-  const addCustomTag = () => {
-    const tag = tagInput.trim();
-    if (tag && !customTags.includes(tag) && customTags.length + selectedTags.length < 10) {
-      setCustomTags([...customTags, tag]);
-      setTagInput('');
-    } else if (customTags.length + selectedTags.length >= 10) {
-      showToast('You can have up to 10 tags total', 'error');
-    }
-  };
-
-  const removeCustomTag = (tag: string) => {
-    setCustomTags(customTags.filter(t => t !== tag));
   };
 
   // Handle form submission
@@ -117,16 +94,19 @@ export default function CategoriesAndTagsPage() {
       return;
     }
     
+    if (selectedTags.length === 0) {
+      setError('Please select at least one tag');
+      return;
+    }
+    
     setSubmitting(true);
     setError(null);
     
     try {
       // Update business data
-      const allTags = [...selectedTags, ...customTags];
-      
       const updateData = {
         category: selectedCategory,
-        tags: allTags,
+        tags: selectedTags,
       };
       
       await updateBusiness(businessId, updateData);
@@ -169,7 +149,7 @@ export default function CategoriesAndTagsPage() {
             <div>
               <h2 className="text-lg font-medium text-gray-900">Business Categories and Tags</h2>
               <p className="mt-1 text-sm text-gray-500">
-                Select a category and tags that best represent your business. This helps others find you.
+                Select a category and up to 3 tags that best represent your business. This helps others find you.
               </p>
             </div>
 
@@ -196,7 +176,7 @@ export default function CategoriesAndTagsPage() {
               {/* Tags Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Tags ({selectedTags.length + customTags.length}/10)
+                  Business Tags ({selectedTags.length}/3)
                 </label>
                 <div className="mb-3 flex flex-wrap gap-2">
                   {tags.map(tag => (
@@ -209,62 +189,16 @@ export default function CategoriesAndTagsPage() {
                           ? 'bg-blue-100 text-blue-800 border border-blue-200'
                           : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                       }`}
+                      disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.id)}
                     >
                       {tag.name}
                     </button>
                   ))}
                 </div>
                 
-                {/* Custom Tags */}
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Add Custom Tags
-                  </label>
-                  <div className="flex">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={handleTagInputKeyDown}
-                      placeholder="Add a custom tag and press Enter"
-                      className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      disabled={customTags.length + selectedTags.length >= 10}
-                    />
-                    <Button
-                      type="button"
-                      onClick={addCustomTag}
-                      className="ml-2"
-                      disabled={!tagInput.trim() || customTags.length + selectedTags.length >= 10}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Press Enter or click Add to add a custom tag
-                  </p>
-                  
-                  {customTags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {customTags.map((tag, index) => (
-                        <div
-                          key={index}
-                          className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => removeCustomTag(tag)}
-                            className="ml-2 text-green-700 hover:text-green-900"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  Select up to 3 tags that best describe your business. These tags help potential partners and clients find you.
+                </p>
               </div>
             </div>
 

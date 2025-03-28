@@ -1,3 +1,4 @@
+// src/components/dashboard/ProfileCompletionCard.tsx
 import React from 'react';
 import Link from 'next/link';
 import { Business } from '@/types';
@@ -35,7 +36,7 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({ business 
     },
     {
       name: 'Categories & Tags',
-      description: 'Business category and relevant tags',
+      description: 'Business category and up to 3 relevant tags',
       completed: profileCompletionStatus.categoriesAndTags,
       href: '/dashboard/profile/categories',
     },

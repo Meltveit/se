@@ -1,11 +1,24 @@
-import React from 'react';
+// src/app/layout.tsx
+import React, { useEffect } from 'react';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastProvider } from '@/contexts/ToastContext';
+import { checkAndPopulateSampleData } from '@/lib/firebase/populateSampleData';
 
 const inter = Inter({ subsets: ['latin'] });
+
+// Function to initialize sample data - called client-side
+const InitSampleData = () => {
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      checkAndPopulateSampleData();
+    }
+  }, []);
+  
+  return null;
+};
 
 export default function RootLayout({
   children,
@@ -38,6 +51,8 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>
             {children}
+            {/* Only run in development mode */}
+            {process.env.NODE_ENV === 'development' && <InitSampleData />}
           </ToastProvider>
         </AuthProvider>
       </body>

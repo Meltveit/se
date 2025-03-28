@@ -1,3 +1,4 @@
+// src/components/common/Input.tsx
 import React, { InputHTMLAttributes, forwardRef } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -25,7 +26,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     
     const baseInputStyles = 'block rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm';
     const widthStyle = fullWidth ? 'w-full' : '';
-    const errorStyle = error ? 'border-red-300 text-red-900 placeholder-red-300' : 'border-gray-300';
+    const errorStyle = error ? 'border-red-300 text-red-900 placeholder-red-300' : 'border-gray-300 text-gray-900';
     const iconStyles = leftIcon ? 'pl-10' : rightIcon ? 'pr-10' : '';
     
     return (

@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-// Basic Types
+// Basic Timestamp Type
 export type FirebaseTimestamp = Timestamp;
 
 // User Types
@@ -20,10 +20,12 @@ export interface User {
   isBusinessAdmin: boolean;
   businessId?: string;
   savedBusinesses?: string[];
+  followedBusinesses?: string[];
   settings?: {
     notifications: boolean;
     newsletter: boolean;
     language: string;
+    privacyMode?: boolean;
   };
   lastActive?: FirebaseTimestamp;
   createdAt: FirebaseTimestamp;
@@ -85,16 +87,21 @@ export interface Business {
   featured?: boolean;
   verified?: boolean;
   profileCompletionStatus: ProfileCompletionStatus;
-  followerCount?: number;
-  viewCount?: number;
+  followerCount: number;
+  viewCount: number;
   ownerId: string;
   admins?: string[];
   status: 'active' | 'pending' | 'suspended';
+  settings?: {
+    acceptMessages?: boolean;
+    receiveUpdates?: boolean;
+    language?: string;
+  };
   createdAt: FirebaseTimestamp;
   updatedAt: FirebaseTimestamp;
 }
 
-// Post Types
+// Attachment and Link Types
 export interface Attachment {
   id: string;
   name: string;
@@ -110,6 +117,7 @@ export interface ExternalLink {
   description?: string;
 }
 
+// Post Types
 export interface Post {
   id: string;
   businessId: string;
@@ -133,7 +141,7 @@ export interface Post {
   updatedAt: FirebaseTimestamp;
 }
 
-// Message Types
+// Messaging Types
 export interface Message {
   id: string;
   conversationId: string;
@@ -158,7 +166,7 @@ export interface Conversation {
   };
   unreadCount: Record<string, number>;
   status: 'active' | 'archived';
-  type?: string;
+  type: 'inquiry' | 'business-to-business' | 'general';
   subject?: string;
   createdAt: FirebaseTimestamp;
   updatedAt: FirebaseTimestamp;
@@ -202,10 +210,20 @@ export interface Tag {
   createdAt: FirebaseTimestamp;
 }
 
-// Form state types
+// Form and State Types
 export interface FormState {
   isSubmitting: boolean;
   isSuccess: boolean;
   isError: boolean;
   errorMessage?: string;
+}
+
+// Composite Types for Specific Use Cases
+export interface BusinessWithParticipant extends Business {
+  participantDetails?: (User | Business)[];
+}
+
+export interface ConversationWithParticipants extends Conversation {
+  participantDetails?: (User | Business)[];
+  otherParticipant?: User | Business;
 }

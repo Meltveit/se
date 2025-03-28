@@ -1,3 +1,4 @@
+// src/components/common/Textarea.tsx
 import React, { TextareaHTMLAttributes, forwardRef } from 'react';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -21,7 +22,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     
     const baseTextareaStyles = 'block rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm';
     const widthStyle = fullWidth ? 'w-full' : '';
-    const errorStyle = error ? 'border-red-300 text-red-900 placeholder-red-300' : 'border-gray-300';
+    const errorStyle = error ? 'border-red-300 text-red-900 placeholder-red-300' : 'border-gray-300 text-gray-900';
     
     return (
       <div className={`${widthStyle} ${className}`}>
