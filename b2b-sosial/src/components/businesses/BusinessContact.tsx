@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { Business } from '@/types';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';

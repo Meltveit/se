@@ -37,16 +37,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     purple: 'bg-purple-600',
   };
   
-  // Calculate color based on percentage (optional feature)
-  const calculateColor = () => {
-    if (normalizedPercentage < 25) return colorVariants.red;
-    if (normalizedPercentage < 50) return colorVariants.yellow;
-    if (normalizedPercentage < 75) return colorVariants.indigo;
-    return colorVariants.green;
-  };
-  
-  // Use the provided color or calculate based on percentage
-  const barColor = color === 'blue' ? colorVariants.blue : colorVariants[color];
+  // Use the provided color
+  const barColor = colorVariants[color];
   
   return (
     <div className={className}>

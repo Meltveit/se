@@ -1,31 +1,24 @@
 import React from 'react';
 import { Post, Business } from '@/types';
-import { getPosts } from '@/lib/firebase/db';
 import Card from '@/components/common/Card';
 
 interface PostListProps {
-  businessId?: string;
-  categoryId?: string;
-  tagId?: string;
-  initialLimit?: number;
-  skip?: number;
+  posts?: Post[];
+  businesses?: Record<string, Business>;
   hideLoadMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 const PostList: React.FC<PostListProps> = ({
-  businessId,
-  categoryId,
-  tagId,
-  initialLimit = 10,
-  skip = 0,
-  hideLoadMore = false
+  posts = [],
+  businesses = {},
+  hideLoadMore = false,
+  onLoadMore
 }) => {
-  // Placeholder for actual implementation
-  const posts: Post[] = [];
-  const businesses: Record<string, Business> = {};
-
   const handleLoadMore = () => {
-    // Placeholder for load more functionality
+    if (onLoadMore) {
+      onLoadMore();
+    }
   };
 
   return (

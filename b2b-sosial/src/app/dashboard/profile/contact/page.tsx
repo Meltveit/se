@@ -101,7 +101,7 @@ export default function ContactDetailsPage() {
       setAvailableRegions([]);
       setFormData(prev => ({ ...prev, region: '' }));
     }
-  }, [formData.country]);
+  }, [formData.country, formData.region]);
 
   // Fetch business data
   useEffect(() => {

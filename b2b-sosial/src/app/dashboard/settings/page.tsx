@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getBusiness, updateBusiness } from '@/lib/firebase/db';
 import { Business } from '@/types';
@@ -16,8 +15,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useToast } from '@/contexts/ToastContext';
 
 export default function SettingsPage() {
-  const { user, businessId } = useAuth();
-  const router = useRouter();
+  const { businessId } = useAuth();
   const { showToast } = useToast();
   
   const [business, setBusiness] = useState<Business | null>(null);

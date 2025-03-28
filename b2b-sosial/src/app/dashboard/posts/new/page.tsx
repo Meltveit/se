@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { getBusiness, getBusinesses } from '@/lib/firebase/db';
+import { getBusiness } from '@/lib/firebase/db';
 import { Business } from '@/types';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
@@ -13,7 +13,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useToast } from '@/contexts/ToastContext';
 
 export default function NewPostPage() {
-  const { user, businessId } = useAuth();
+  const { businessId } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
   
@@ -51,7 +51,7 @@ export default function NewPostPage() {
   }, [businessId]);
 
   // Handle successful post creation
-  const handlePostSuccess = (postId: string) => {
+  const handlePostSuccess = () => {
     showToast('Post created successfully!', 'success');
     router.push('/dashboard/posts');
   };

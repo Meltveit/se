@@ -163,41 +163,68 @@ export default function MediaUploadPage() {
       
       // Upload new logo if selected
       if (logoFile) {
-        logoUrl = await uploadBusinessLogo(
-          businessId, 
-          logoFile,
-          progress => setUploadProgress(prev => progress * 0.33)
-        );
+        try {
+          const imageUrl = await uploadBusinessLogo(
+            businessId, 
+            logoFile,
+            (progress) => {
+              setUploadProgress(progress * 0.33);
+            }
+          );
+          logoUrl = imageUrl;
+        } catch (error) {
+          console.error('Error uploading logo:', error);
+          showToast('Failed to upload logo', 'error');
+          setSubmitting(false);
+          return;
+        }
       }
       
       // Upload new banner if selected
       if (bannerFile) {
-        bannerUrl = await uploadBusinessBanner(
-          businessId, 
-          bannerFile,
-          progress => setUploadProgress(prev => 33 + progress * 0.33)
-        );
+        try {
+          const imageUrl = await uploadBusinessBanner(
+            businessId, 
+            bannerFile,
+            (progress) => {
+              setUploadProgress(33 + progress * 0.33);
+            }
+          );
+          bannerUrl = imageUrl;
+        } catch (error) {
+          console.error('Error uploading banner:', error);
+          showToast('Failed to upload banner', 'error');
+          setSubmitting(false);
+          return;
+        }
       }
       
       // Upload new gallery images if selected
       if (galleryFiles.length > 0) {
-        const uploadedUrls = await Promise.all(
-          galleryFiles.map((file, index) => 
-            uploadGalleryImage(
-              businessId,
-              file,
-              galleryUrls.length + index,
-              progress => {
-                const singleFileContribution = 33 / galleryFiles.length;
-                setUploadProgress(prev => 
-                  66 + (index * singleFileContribution) + (progress * singleFileContribution)
-                );
-              }
+        try {
+          const uploadedUrls = await Promise.all(
+            galleryFiles.map((file, index) => 
+              uploadGalleryImage(
+                businessId,
+                file,
+                galleryUrls.length + index,
+                (progress) => {
+                  const singleFileContribution = 33 / galleryFiles.length;
+                  setUploadProgress(
+                    66 + (index * singleFileContribution) + (progress * singleFileContribution)
+                  );
+                }
+              )
             )
-          )
-        );
-        
-        galleryUrls = [...galleryUrls, ...uploadedUrls];
+          );
+          
+          galleryUrls = [...galleryUrls, ...uploadedUrls];
+        } catch (error) {
+          console.error('Error uploading gallery images:', error);
+          showToast('Failed to upload gallery images', 'error');
+          setSubmitting(false);
+          return;
+        }
       }
       
       // Update business data
@@ -369,7 +396,7 @@ export default function MediaUploadPage() {
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
-                <p className="mt-1 text-sm text-center text-gray-500">
+                <p className="mt-1 text-xs text-center text-gray-500">
                   Uploading... {Math.round(uploadProgress)}%
                 </p>
               </div>

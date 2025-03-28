@@ -45,8 +45,8 @@ export default function PostDetailPage() {
         if (businessData) {
           setBusiness(businessData);
         }
-      } catch (err) {
-        console.error('Error fetching data:', err);
+      } catch {
+        // Catch without parameter
         setError('Failed to load post. Please try again later.');
       } finally {
         setLoading(false);
@@ -62,7 +62,8 @@ export default function PostDetailPage() {
     try {
       const date = timestamp.toDate();
       return format(date, 'MMMM d, yyyy');
-    } catch (err) {
+    } catch {
+      // Catch without parameter
       return '';
     }
   };

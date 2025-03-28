@@ -1,5 +1,5 @@
 // Currently only keeping function signatures that are used
-export const generateThumbnail = async (_file: File): Promise<string | null> => {
+export const generateThumbnail = async (/* file: File */): Promise<string | null> => {
   // This would typically be implemented with a cloud function or client-side image processing
   // For simplicity, we'll just return null for now
   return null;

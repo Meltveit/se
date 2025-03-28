@@ -4,8 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { format } from 'date-fns';
-import { Conversation, Message } from '@/types/message'; 
+import { Conversation } from '@/types/message'; 
 import { User, Business } from '@/types';
 import { getConversation, getMessages, markConversationAsRead, getBusiness, getUser } from '@/lib/firebase/db';
 import MessageForm from '@/components/messages/MessageForm';
@@ -147,10 +146,6 @@ export default function ConversationPage() {
     );
   }
   
-  const formatDate = (date: Date) => {
-    return format(date, 'MMMM d, yyyy');
-  };
-  
   return (
     <AuthGuard requireAuth>
       <MainLayout>
@@ -241,8 +236,8 @@ export default function ConversationPage() {
               {/* Message Thread */}
               <div className="h-96 overflow-y-auto mb-4 px-2">
                 <MessageThread 
-                  messages={messages} 
-                  currentUserId={user?.uid || ''} 
+                  messages={messages.map(msg => ({ ...msg, text: msg.text || '' }))}
+                  currentUserId={user?.uid || ''}
                 />
                 <div ref={messagesEndRef} />
               </div>

@@ -6,11 +6,10 @@ import {
   User,
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut as firebaseSignOut
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/config';
 import { getUserProfile, isBusinessAdmin } from '@/lib/firebase/auth';
 import { Business } from '@/types'; // Legg til denne importering

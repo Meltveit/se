@@ -23,8 +23,6 @@ function MapContent() {
   
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   
   // Filters
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -76,8 +74,6 @@ function MapContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        
         // Fetch categories
         const categoriesData = await getCategories();
         setCategories([
@@ -101,9 +97,6 @@ function MapContent() {
         }
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to load map data. Please try again later.');
-      } finally {
-        setLoading(false);
       }
     };
 

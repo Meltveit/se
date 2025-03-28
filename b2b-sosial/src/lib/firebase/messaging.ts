@@ -12,7 +12,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from './config';
-import { Conversation, Message } from '@/types/message';
+import { Conversation } from '@/types/message';
 import { Business, User } from '@/types';
 
 // Search for users to message

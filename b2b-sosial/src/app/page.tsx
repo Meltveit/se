@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { getFeaturedBusinesses, getCategories, getPosts } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
 import Button from '@/components/common/Button';
@@ -49,7 +48,7 @@ export default async function HomePage() {
               View All
             </Link>
           </div>
-          {featuredBusinesses.length > 0 ? (
+          {featuredBusinesses && featuredBusinesses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredBusinesses.map((business) => (
                 <BusinessCard

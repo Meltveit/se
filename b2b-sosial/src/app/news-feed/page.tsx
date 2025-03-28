@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import PostList from '@/components/posts/PostList';
 import Card from '@/components/common/Card';
-import { getCategories, getTags } from '@/lib/firebase/db';
-import { Category, Tag } from '@/types';
+import { getCategories, getTags, getPosts, getBusiness } from '@/lib/firebase/db';
+import { Category, Tag, Post, Business } from '@/types';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
@@ -19,20 +19,47 @@ function NewsFeedContent() {
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [businesses, setBusinesses] = useState<Record<string, Business>>({});
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  // Fetch categories and tags
+  // Fetch categories, tags, and posts
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        
+        // Get categories and tags
         const [categoriesData, tagsData] = await Promise.all([
           getCategories(),
           getTags()
         ]);
         setCategories(categoriesData);
         setTags(tagsData);
+        
+        // Get posts
+        const postsData = await getPosts(10);
+        setPosts(postsData.posts);
+        
+        // Get business data for each post
+        const businessMap: Record<string, Business> = {};
+        
+        // Using Promise.all to fetch all businesses in parallel
+        const businessPromises = postsData.posts
+          .filter(post => post.businessId && !businessMap[post.businessId])
+          .map(post => getBusiness(post.businessId));
+        
+        const businessResults = await Promise.all(businessPromises);
+        
+        // Build the business map from results
+        businessResults.forEach(business => {
+          if (business) {
+            businessMap[business.id] = business;
+          }
+        });
+        
+        setBusinesses(businessMap);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -41,12 +68,22 @@ function NewsFeedContent() {
     };
 
     fetchData();
-  }, []);
+  }, [businessId, categoryId, tagId]);
 
   // Handle filter selection
   const handleFilterSelect = (filter: string) => {
     setActiveFilter(filter);
   };
+
+  // Handle loading more posts
+  const handleLoadMore = () => {
+    // Implementation for loading more posts
+    console.log('Loading more posts...');
+  };
+
+  // Split posts for display with ad in between
+  const firstPosts = posts.slice(0, 3);
+  const remainingPosts = posts.slice(3);
 
   return (
     <div className="bg-white">
@@ -164,10 +201,8 @@ function NewsFeedContent() {
             <div className="space-y-6">
               {/* First 3 posts */}
               <PostList 
-                businessId={businessId}
-                categoryId={categoryId}
-                tagId={tagId}
-                initialLimit={3}
+                posts={firstPosts}
+                businesses={businesses}
                 hideLoadMore={true}
               />
               
@@ -178,11 +213,9 @@ function NewsFeedContent() {
               
               {/* Rest of the posts */}
               <PostList 
-                businessId={businessId}
-                categoryId={categoryId}
-                tagId={tagId}
-                initialLimit={6}
-                skip={3}
+                posts={remainingPosts}
+                businesses={businesses}
+                onLoadMore={handleLoadMore}
               />
               
               {/* Ad at the bottom of the page */}

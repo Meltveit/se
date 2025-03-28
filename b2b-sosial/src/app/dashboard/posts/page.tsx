@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPosts, deletePost } from '@/lib/firebase/db';
 import { Post } from '@/types';
@@ -17,7 +16,6 @@ import Image from 'next/image';
 
 export default function PostsPage() {
   const { businessId } = useAuth();
-  const router = useRouter();
   const { showToast } = useToast();
   
   const [posts, setPosts] = useState<Post[]>([]);
@@ -35,8 +33,8 @@ export default function PostsPage() {
         setLoading(true);
         const result = await getPosts(100, undefined, businessId);
         setPosts(result.posts);
-      } catch (err) {
-        console.error('Error fetching posts:', err);
+      } catch {
+        console.error('Error fetching posts');
         setError('Failed to load posts. Please try again later.');
       } finally {
         setLoading(false);
@@ -52,7 +50,7 @@ export default function PostsPage() {
     try {
       const date = timestamp.toDate();
       return formatDistanceToNow(date, { addSuffix: true });
-    } catch (err) {
+    } catch {
       return '';
     }
   };

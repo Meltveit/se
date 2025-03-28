@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Post } from '@/types';
 import { createPost, updatePost } from '@/lib/firebase/db';
@@ -30,14 +30,16 @@ const PostForm: React.FC<PostFormProps> = ({
   const [content, setContent] = useState(existingPost?.content || '');
   const [tags, setTags] = useState<string[]>(existingPost?.tags || []);
   const [tagInput, setTagInput] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [coverImageUrl, setCoverImageUrl] = useState<string>(existingPost?.coverImage || '');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fileUploadRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { showToast } = useToast();
 
