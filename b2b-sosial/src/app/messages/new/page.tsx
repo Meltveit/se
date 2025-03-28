@@ -12,7 +12,7 @@ import Input from '@/components/common/Input';
 import Textarea from '@/components/common/Textarea';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { searchBusinesses, searchUsers, createConversation, sendMessage } from '@/lib/firebase/db';
+import { searchBusinesses, searchUsers, createConversation, sendMessage } from '@/lib/firebase/messaging';
 import { User, Business } from '@/types';
 
 export default function NewMessagePage() {

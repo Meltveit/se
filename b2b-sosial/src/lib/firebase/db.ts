@@ -1,25 +1,25 @@
 import { 
-    collection, 
-    doc, 
-    getDoc, 
-    getDocs, 
-    setDoc, 
-    updateDoc, 
-    query, 
-    where, 
-    orderBy, 
-    limit, 
-    startAfter,
-    addDoc,
-    deleteDoc,
-    serverTimestamp,
-    DocumentData,
-    QueryConstraint,
-    QueryDocumentSnapshot,
-    DocumentReference
-  } from 'firebase/firestore';
-  import { db } from './config';
-  import { Business, Post } from '@/types';
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  setDoc, 
+  updateDoc, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  startAfter,
+  addDoc,
+  deleteDoc,
+  serverTimestamp,
+  DocumentData,
+  QueryConstraint,
+  QueryDocumentSnapshot,
+  DocumentReference
+} from 'firebase/firestore';
+import { db } from './config';
+import { Business, Post, User } from '@/types';
   
   // Business related functions
   export const getBusinesses = async (

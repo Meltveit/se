@@ -6,7 +6,11 @@ import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
 
-const QuickBusinessRegistrationForm: React.FC = () => {
+interface QuickBusinessRegistrationFormProps {
+  onSuccess?: (email: string) => void;
+}
+
+const QuickBusinessRegistrationForm: React.FC<QuickBusinessRegistrationFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     name: '',
     orgNumber: '',
@@ -72,8 +76,12 @@ const QuickBusinessRegistrationForm: React.FC = () => {
         subscribeNewsletter: formData.subscribeNewsletter,
       });
       
-      showToast('Registration successful! Please check your email to verify your account.', 'success');
-      router.push('/login?email=' + encodeURIComponent(formData.contactPersonEmail));
+      if (onSuccess) {
+        onSuccess(formData.contactPersonEmail);
+      } else {
+        showToast('Registration successful! Please check your email to verify your account.', 'success');
+        router.push('/login?email=' + encodeURIComponent(formData.contactPersonEmail));
+      }
     } catch (error: any) {
       console.error('Registration error:', error);
       const errorCode = error.code;
