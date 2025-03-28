@@ -1,9 +1,19 @@
+// src/components/messages/MessageThread.tsx
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { Message } from '@/types/message';
 import { User, Business } from '@/types';
 import { getUser, getBusiness } from '@/lib/firebase/db';
+
+// Type guard for å sjekke objekttypen
+function isBusiness(obj: any): obj is Business {
+  return obj && 'name' in obj && 'orgNumber' in obj;
+}
+
+function isUser(obj: any): obj is User {
+  return obj && 'firstName' in obj && 'email' in obj;
+}
 
 interface MessageThreadProps {
   messages: Message[];
@@ -29,7 +39,9 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
   // Get unique sender IDs from messages
   useEffect(() => {
     const fetchUsers = async () => {
-      const senderIds = [...new Set(messages.map((message) => message.senderId))];
+      // Bruk Array.from() for å konvertere Set til Array for å unngå Set-iterasjon-feilen
+      const senderIds = Array.from(new Set(messages.map((message) => message.senderId)));
+      
       const userPromises = senderIds.map(async (senderId) => {
         // Skip if already in cache
         if (userCache[senderId] !== undefined) return null;
@@ -94,9 +106,9 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
       return 'Unknown User';
     }
     
-    if ('name' in user) {
+    if (isBusiness(user)) {
       return user.name;
-    } else if ('firstName' in user) {
+    } else if (isUser(user)) {
       return `${user.firstName} ${user.lastName || ''}`;
     }
     
@@ -116,6 +128,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
           <div className="space-y-4">
             {dateMessages.map((message) => {
               const isCurrentUser = message.senderId === currentUserId;
+              const sender = userCache[message.senderId];
               
               return (
                 <div
@@ -127,17 +140,17 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
                     {!isCurrentUser && (
                       <div className="flex-shrink-0 mr-2">
                         <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                          {userCache[message.senderId] && 'logoUrl' in userCache[message.senderId]! && userCache[message.senderId]!.logoUrl ? (
+                          {sender && isBusiness(sender) && sender.logoUrl ? (
                             <Image
-                              src={(userCache[message.senderId] as Business).logoUrl}
+                              src={sender.logoUrl}
                               alt={getDisplayName(message.senderId)}
                               width={32}
                               height={32}
                               className="object-cover"
                             />
-                          ) : userCache[message.senderId] && 'photoURL' in userCache[message.senderId]! && userCache[message.senderId]!.photoURL ? (
+                          ) : sender && isUser(sender) && sender.photoURL ? (
                             <Image
-                              src={(userCache[message.senderId] as User).photoURL}
+                              src={sender.photoURL}
                               alt={getDisplayName(message.senderId)}
                               width={32}
                               height={32}
@@ -179,7 +192,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
                                   isCurrentUser ? 'bg-blue-700' : 'bg-gray-200'
                                 }`}
                               >
-                                <a
+                                
                                   href={attachment.url}
                                   target="_blank"
                                   rel="noopener noreferrer"

@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -12,11 +13,13 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/config';
 import { getUserProfile, isBusinessAdmin } from '@/lib/firebase/auth';
+import { Business } from '@/types'; // Legg til denne importering
 
 interface AuthContextType {
   user: User | null;
   userProfile: any | null;
   businessId: string | null;
+  business: Business | null;
   isBusinessOwner: boolean;
   loading: boolean;
   error: string | null;
@@ -29,6 +32,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   userProfile: null,
   businessId: null,
+  business: null, // Legg til denne
   isBusinessOwner: false,
   loading: true,
   error: null,
@@ -47,6 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [business, setBusiness] = useState<Business | null>(null); // Legg til denne
   const [isBusinessOwner, setIsBusinessOwner] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,8 +74,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // If user is business owner, set businessId (which is the same as userId)
           if (businessOwner) {
             setBusinessId(currentUser.uid);
+            
+            // Fetch business data
+            const businessDoc = await getDoc(doc(db, 'businesses', currentUser.uid));
+            if (businessDoc.exists()) {
+              setBusiness({
+                id: businessDoc.id,
+                ...businessDoc.data() as Omit<Business, 'id'>
+              });
+            } else {
+              setBusiness(null);
+            }
           } else {
             setBusinessId(null);
+            setBusiness(null);
           }
         } catch (err) {
           console.error('Error getting user profile:', err);
@@ -80,6 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Reset user state when logged out
         setUserProfile(null);
         setBusinessId(null);
+        setBusiness(null);
         setIsBusinessOwner(false);
       }
       
@@ -128,6 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     userProfile,
     businessId,
+    business, // Legg til denne
     isBusinessOwner,
     loading,
     error,

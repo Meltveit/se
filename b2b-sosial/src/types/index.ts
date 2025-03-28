@@ -82,6 +82,7 @@ export interface Business {
   contactPerson: ContactPerson;
   socialMedia?: SocialMedia;
   logoUrl?: string;
+  businessType?: string;
   bannerUrl?: string;
   gallery?: string[];
   featured?: boolean;
