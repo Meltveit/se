@@ -1,3 +1,4 @@
+"use client"
 // src/app/layout.tsx
 import React, { useEffect } from 'react';
 import { Inter } from 'next/font/google';

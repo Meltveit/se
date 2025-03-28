@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
-import { Conversation, Message } from '@/types/message';
+import { Conversation, Message } from '@/types/message'; // Ensure this matches your intended Message type
 import { User, Business } from '@/types';
 import { getConversation, getMessages, markConversationAsRead, getBusiness, getUser } from '@/lib/firebase/db';
 import MessageForm from '@/components/messages/MessageForm';
@@ -16,14 +16,19 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import MainLayout from '@/components/layout/MainLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
 
+// Adjust Message type to match the one returned by getMessages if needed
+interface AdjustedMessage extends Message {
+  text?: string; // Make text optional if it's undefined in your Firestore data
+}
+
 export default function ConversationPage() {
   const { conversationId } = useParams();
   const router = useRouter();
   const { user } = useAuth();
   
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [otherParticipant, setOtherParticipant] = useState<User | Business | null>(null);
+  const [messages, setMessages] = useState<AdjustedMessage[]>([]); // Use AdjustedMessage to allow optional text
+  const [otherParticipant, setOtherParticipant] = useState<User | Business | null>(null); // Union type for User or Business
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -53,21 +58,22 @@ export default function ConversationPage() {
         
         // Fetch messages
         const messagesData = await getMessages(conversationId as string);
-        setMessages(messagesData);
+        setMessages(messagesData as AdjustedMessage[]); // Cast to AdjustedMessage
         
         // Get other participant (assuming 1-on-1 conversation)
         const otherParticipantId = conversationData.participants.find(id => id !== user.uid);
         
         if (otherParticipantId) {
           // First try to get as business
-          let participant = await getBusiness(otherParticipantId);
+          const businessParticipant = await getBusiness(otherParticipantId);
           
-          // If not a business, try to get as user
-          if (!participant) {
-            participant = await getUser(otherParticipantId);
+          if (businessParticipant) {
+            setOtherParticipant(businessParticipant); // Business found
+          } else {
+            // If not a business, try to get as user
+            const userParticipant = await getUser(otherParticipantId);
+            setOtherParticipant(userParticipant); // User or null
           }
-          
-          setOtherParticipant(participant);
         }
       } catch (err) {
         console.error('Error fetching conversation data:', err);
@@ -90,11 +96,9 @@ export default function ConversationPage() {
   // Handle sending a new message
   const handleSendMessage = async (message: string, attachments?: File[]) => {
     // This will be implemented in the MessageForm component
-    // We'll just need to refresh the messages after sending
-    // Fetch updated messages
     if (conversationId) {
       const updatedMessages = await getMessages(conversationId as string);
-      setMessages(updatedMessages);
+      setMessages(updatedMessages as AdjustedMessage[]); // Cast to AdjustedMessage
     }
   };
   
