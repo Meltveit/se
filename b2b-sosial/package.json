@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings 0",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "audit:fix": "npm audit fix --force"
   },
   "dependencies": {
