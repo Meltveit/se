@@ -73,7 +73,7 @@ const BusinessContact: React.FC<BusinessContactProps> = ({ business, onSendMessa
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">{item.label}</p>
                 {item.action ? (
-                  <a
+                  <a 
                     href={item.action}
                     target={item.label === 'Website' ? '_blank' : undefined}
                     rel={item.label === 'Website' ? 'noopener noreferrer' : undefined}

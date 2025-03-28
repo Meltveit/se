@@ -6,7 +6,6 @@ import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import Select from '@/components/common/Select';
 import { useToast } from '@/contexts/ToastContext';
-import { Country } from '@/types';
 
 // Mock country data - in a real app, you'd use country-state-city package
 const countries = [

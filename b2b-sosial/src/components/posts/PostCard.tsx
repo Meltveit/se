@@ -15,7 +15,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, business }) => {
     try {
       const date = timestamp.toDate();
       return formatDistanceToNow(date, { addSuffix: true });
-    } catch (err) {
+    } catch {
       return '';
     }
   };
@@ -94,7 +94,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, business }) => {
         {post.tags && post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1">
             {post.tags.slice(0, 3).map((tag, index) => (
-              <span key={index} className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded">
+              <span 
+                key={index} 
+                className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded"
+              >
                 #{tag}
               </span>
             ))}

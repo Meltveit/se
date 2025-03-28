@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AuthLayout from '@/components/layout/AuthLayout';
 import EmailVerification from '@/components/auth/EmailVerification';
-import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Component that uses useSearchParams
 function BusinessVerificationContent() {
   const searchParams = useSearchParams();
   const email = searchParams?.get('email') || '';
-  const { user } = useAuth();
   
   return (
     <EmailVerification email={email} />

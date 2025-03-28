@@ -1,24 +1,19 @@
-// src/lib/firebase/db.ts
 import { 
   collection, 
   doc, 
   getDoc, 
   getDocs, 
-  setDoc, 
   updateDoc, 
+  addDoc, 
   query, 
   where, 
   orderBy, 
   limit, 
   startAfter,
-  addDoc,
-  deleteDoc,
   serverTimestamp,
   DocumentData,
   QueryConstraint,
-  QueryDocumentSnapshot,
-  DocumentReference,
-  writeBatch
+  QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
 import { Business, Post, User, Category, Tag } from '@/types';
@@ -339,7 +334,10 @@ export const updatePost = async (postId: string, postData: Partial<Post>): Promi
 export const deletePost = async (postId: string): Promise<void> => {
   try {
     const postRef = doc(db, 'posts', postId);
-    await deleteDoc(postRef);
+    await updateDoc(postRef, {
+      status: 'deleted',
+      updatedAt: serverTimestamp()
+    });
   } catch (error) {
     console.error('Error deleting post:', error);
     throw error;

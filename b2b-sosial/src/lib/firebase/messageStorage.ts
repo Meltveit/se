@@ -1,58 +1,10 @@
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from './config';
-
-// Upload a message attachment
-export const uploadMessageAttachment = async (
-  conversationId: string,
-  file: File,
-  index: number,
-  onProgress?: (progress: number) => void
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    try {
-      const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
-      const path = `messages/${conversationId}/${timestamp}-${index}.${fileExtension}`;
-      const storageRef = ref(storage, path);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          if (onProgress) {
-            onProgress(progress);
-          }
-        },
-        (error) => {
-          console.error('Error uploading attachment:', error);
-          reject(error);
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(downloadURL);
-          } catch (error) {
-            console.error('Error getting download URL:', error);
-            reject(error);
-          }
-        }
-      );
-    } catch (error) {
-      console.error('Error starting upload:', error);
-      reject(error);
-    }
-  });
-};
-
-// Generate a thumbnail for an image attachment
-export const generateThumbnail = async (file: File): Promise<string | null> => {
+// Currently only keeping function signatures that are used
+export const generateThumbnail = async (_file: File): Promise<string | null> => {
   // This would typically be implemented with a cloud function or client-side image processing
   // For simplicity, we'll just return null for now
   return null;
 };
 
-// Get file size in a readable format
 export const getReadableFileSize = (size: number): string => {
   if (size === 0) return '0 Bytes';
   
@@ -63,7 +15,6 @@ export const getReadableFileSize = (size: number): string => {
   return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-// Get file icon based on file type
 export const getFileIcon = (fileType: string): string => {
   if (fileType.startsWith('image/')) {
     return 'image';
@@ -93,7 +44,6 @@ export const getFileIcon = (fileType: string): string => {
   }
 };
 
-// Check if file type is allowed
 export const isAllowedFileType = (fileType: string): boolean => {
   const allowedTypes = [
     // Images
@@ -125,7 +75,6 @@ export const isAllowedFileType = (fileType: string): boolean => {
   return allowedTypes.includes(fileType);
 };
 
-// Get maximum file size based on file type
 export const getMaxFileSize = (fileType: string): number => {
   if (fileType.startsWith('image/')) {
     return 10 * 1024 * 1024; // 10MB

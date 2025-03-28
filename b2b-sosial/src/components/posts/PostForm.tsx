@@ -5,8 +5,6 @@ import { createPost, updatePost } from '@/lib/firebase/db';
 import { uploadPostImage } from '@/lib/firebase/storage';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
-import Textarea from '@/components/common/Textarea';
-import FileUpload, { FileUploadRef } from '@/components/common/FileUpload';
 import { useToast } from '@/contexts/ToastContext';
 import dynamic from 'next/dynamic';
 
@@ -39,7 +37,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fileUploadRef = useRef<FileUploadRef>(null);
+  const fileUploadRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -64,9 +62,8 @@ const PostForm: React.FC<PostFormProps> = ({
     'link',
   ];
 
-  // Handle tag input
+  // Add tag on Enter or comma
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Add tag on Enter or comma
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addTag();
@@ -160,10 +157,10 @@ const PostForm: React.FC<PostFormProps> = ({
         imageUrls: additionalImageUrls,
         status: 'published' as const,
         authorId: businessId,
-        businessId, // Add businessId
-        viewCount: existingPost?.viewCount || 0, // Default to 0 if not provided
-        likeCount: existingPost?.likeCount || 0, // Default to 0 if not provided
-        commentCount: existingPost?.commentCount || 0, // Default to 0 if not provided
+        businessId,
+        viewCount: existingPost?.viewCount || 0,
+        likeCount: existingPost?.likeCount || 0,
+        commentCount: existingPost?.commentCount || 0,
       };
 
       let postId;
@@ -211,14 +208,13 @@ const PostForm: React.FC<PostFormProps> = ({
       </div>
 
       <div>
-        <Textarea
+        <Input
           label="Summary (optional)"
           id="summary"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
           fullWidth
           placeholder="Brief summary of your post"
-          rows={3}
           hint="A short summary will appear in post previews"
         />
       </div>
@@ -237,20 +233,6 @@ const PostForm: React.FC<PostFormProps> = ({
             className="h-64"
           />
         </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Cover Image {isEditing && coverImageUrl && '(Leave empty to keep current image)'}
-        </label>
-        <FileUpload
-          accept="image/*"
-          maxSize={5}
-          multiple={false}
-          onUpload={(files) => setCoverImage(files[0])}
-          ref={fileUploadRef}
-          hint="Recommended size: 1200 x 630 pixels (16:9 ratio)"
-        />
       </div>
 
       <div>

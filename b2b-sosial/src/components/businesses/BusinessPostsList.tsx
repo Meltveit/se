@@ -32,8 +32,8 @@ const BusinessPostsList: React.FC<BusinessPostsListProps> = ({
         const result = await getPosts(limit, undefined, business.id);
         setPosts(result.posts);
         setHasMore(result.posts.length === limit);
-      } catch (err) {
-        console.error('Error fetching posts:', err);
+      } catch {
+        // Removed unused 'err' parameter
         setError('Failed to load posts. Please try again later.');
       } finally {
         setLoading(false);
@@ -48,7 +48,7 @@ const BusinessPostsList: React.FC<BusinessPostsListProps> = ({
     try {
       const date = timestamp.toDate();
       return formatDistanceToNow(date, { addSuffix: true });
-    } catch (err) {
+    } catch {
       return '';
     }
   };

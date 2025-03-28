@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getBusiness } from '@/lib/firebase/db';
 import { Business } from '@/types';
 import MainLayout from '@/components/layout/MainLayout';
@@ -15,6 +15,7 @@ import Button from '@/components/common/Button';
 
 export default function BusinessProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const businessId = params?.id as string;
   
   const [business, setBusiness] = useState<Business | null>(null);
@@ -22,7 +23,8 @@ export default function BusinessProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
-  const [showMessageModal, setShowMessageModal] = useState(false);
+  // Uncomment if actually using message modal
+  // const [showMessageModal, setShowMessageModal] = useState(false);
 
   // Fetch business data
   useEffect(() => {
@@ -69,8 +71,7 @@ export default function BusinessProfilePage() {
 
   // Handle send message
   const handleSendMessage = () => {
-    setShowMessageModal(true);
-    // In a real app, you would show a message modal component here
+    router.push(`/messages/new?businessId=${businessId}`);
   };
 
   if (loading) {
@@ -95,10 +96,10 @@ export default function BusinessProfilePage() {
               {error ? 'Please try again later.' : 'The business you are looking for does not exist or has been removed.'}
             </p>
             <Button
-              onClick={() => window.history.back()}
+              onClick={() => router.push('/businesses')}
               variant="outline"
             >
-              Go Back
+              Back to Businesses
             </Button>
           </div>
         </div>
@@ -108,7 +109,6 @@ export default function BusinessProfilePage() {
 
   return (
     <MainLayout>
-      {/* Business Header (Banner, Logo, Name, etc.) */}
       <BusinessHeader 
         business={business} 
         isFollowing={isFollowing}
@@ -120,7 +120,6 @@ export default function BusinessProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column (About and Posts) */}
           <div className="lg:col-span-2 space-y-8">
-            {/* About Section */}
             <BusinessDetails business={business} />
             
             {/* Gallery (if exists) */}
@@ -140,14 +139,6 @@ export default function BusinessProfilePage() {
           </div>
         </div>
       </div>
-      
-      {/* Message Modal (would be implemented as a separate component) */}
-      {/* {showMessageModal && (
-        <MessageModal 
-          business={business}
-          onClose={() => setShowMessageModal(false)}
-        />
-      )} */}
     </MainLayout>
   );
 }

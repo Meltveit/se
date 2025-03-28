@@ -1,4 +1,3 @@
-// src/components/layout/DashboardLayout.tsx
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +9,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) => {
-  const { userProfile, businessId } = useAuth();
+  const { userProfile } = useAuth();
   
   return (
     <div className="min-h-screen bg-gray-50">

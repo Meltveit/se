@@ -1,4 +1,3 @@
-// src/components/messages/ConversationList.tsx
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -39,8 +38,8 @@ const ConversationList: React.FC<ConversationListProps> = ({ conversations }) =>
                   }
                   
                   return participant;
-                } catch (error) {
-                  console.error(`Error fetching participant ${participantId}:`, error);
+                } catch {
+                  // Removed unused 'error' parameter
                   return null;
                 }
               })
@@ -58,8 +57,9 @@ const ConversationList: React.FC<ConversationListProps> = ({ conversations }) =>
         );
         
         setConversationsWithDetails(conversationsWithParticipants);
-      } catch (error) {
-        console.error('Error fetching participant details:', error);
+      } catch {
+        // Removed unused 'error' parameter
+        // Silently handle errors or add error handling as needed
       }
     };
     
@@ -87,7 +87,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ conversations }) =>
       
       // Otherwise show date
       return format(date, 'MMM d');
-    } catch (err) {
+    } catch {
       return '';
     }
   };
@@ -141,7 +141,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ conversations }) =>
                     {otherParticipant && 'name' in otherParticipant
                       ? otherParticipant.name
                       : otherParticipant && 'firstName' in otherParticipant
-                      ? `${otherParticipant.firstName} ${otherParticipant.lastName}`
+                      ? `${otherParticipant.firstName} ${otherParticipant.lastName || ''}`
                       : 'Unknown Participant'}
                   </p>
                   <p className="text-xs text-gray-500">

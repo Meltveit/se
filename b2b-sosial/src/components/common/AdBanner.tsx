@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-// Utvid Window-grensesnittet med ekstra egenskaper
+// Extend Window interface with additional properties
 declare global {
   interface Window {
     adsbygoogle?: any[];
@@ -33,9 +33,8 @@ const AdBanner: React.FC<AdBannerProps> = ({
   format = 'auto',
   className = '',
 }) => {
-  const adRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
+  // Removed unused adRef
+  React.useEffect(() => {
     if (platform === 'google' && window.adsbygoogle) {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -71,7 +70,7 @@ const AdBanner: React.FC<AdBannerProps> = ({
   );
 
   // Load Media.net script
-  useEffect(() => {
+  React.useEffect(() => {
     if (platform === 'medianet') {
       const script = document.createElement('script');
       script.src = 'https://contextual.media.net/dmedianet.js?cid=' + 
@@ -81,7 +80,7 @@ const AdBanner: React.FC<AdBannerProps> = ({
 
       script.onload = () => {
         try {
-          // Sjekk at disse egenskapene eksisterer før de settes
+          // Safely set window properties
           if (window) {
             window.medianet_width = width;
             window.medianet_height = height;

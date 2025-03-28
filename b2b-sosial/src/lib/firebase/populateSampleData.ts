@@ -78,15 +78,14 @@ export const checkAndPopulateCategories = async () => {
     if (snapshot.empty) {
       console.log('No categories found, populating sample data...');
       
-      const batches = sampleCategories.map(async (category, index) => {
+      await Promise.all(sampleCategories.map(async (category) => {
         const docRef = doc(categoriesRef, category.slug);
         await setDoc(docRef, {
           ...category,
           createdAt: new Date()
         });
-      });
+      }));
       
-      await Promise.all(batches);
       console.log('Sample categories populated successfully');
     }
   } catch (error) {
@@ -103,15 +102,14 @@ export const checkAndPopulateTags = async () => {
     if (snapshot.empty) {
       console.log('No tags found, populating sample data...');
       
-      const batches = sampleTags.map(async (tag) => {
+      await Promise.all(sampleTags.map(async (tag) => {
         const docRef = doc(tagsRef, tag.slug);
         await setDoc(docRef, {
           ...tag,
           createdAt: new Date()
         });
-      });
+      }));
       
-      await Promise.all(batches);
       console.log('Sample tags populated successfully');
     }
   } catch (error) {

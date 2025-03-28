@@ -1,11 +1,12 @@
-// src/components/messages/MessageForm.tsx
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { sendMessage } from '@/lib/firebase/db';
 import { uploadMessageAttachment } from '@/lib/firebase/storage';
 import Button from '@/components/common/Button';
-import FileUpload, { FileUploadRef } from '@/components/common/FileUpload';
+
+// Remove unused import
+// import FileUpload, { FileUploadRef } from '@/components/common/FileUpload';
 
 // Define the attachment object type
 interface AttachmentObject {
@@ -21,7 +22,10 @@ interface MessageFormProps {
   onMessageSent?: (message: string, attachments?: File[]) => void;
 }
 
-const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent }) => {
+const MessageForm: React.FC<MessageFormProps> = ({ 
+  conversationId, 
+  onMessageSent 
+}) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   
@@ -30,12 +34,19 @@ const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   
-  const fileUploadRef = useRef<FileUploadRef>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Handle file selection
-  const handleAttachmentChange = (files: File[]) => {
-    setAttachments([...attachments, ...files]);
+  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setAttachments([...attachments, ...newFiles]);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
   
   // Remove an attachment
@@ -91,9 +102,6 @@ const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent
       // Clear form
       setMessage('');
       setAttachments([]);
-      if (fileUploadRef.current) {
-        fileUploadRef.current.reset();
-      }
       
       // Focus back on textarea
       if (textareaRef.current) {
@@ -193,9 +201,16 @@ const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent
         <div className="flex ml-2">
           {/* Attachment Button */}
           <div className="relative">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAttachmentChange}
+              multiple
+              className="hidden"
+            />
             <button
               type="button"
-              onClick={() => document.getElementById('message-attachment')?.click()}
+              onClick={() => fileInputRef.current?.click()}
               disabled={isSending}
               className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none"
             >
@@ -214,20 +229,6 @@ const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent
                 />
               </svg>
             </button>
-            
-            {/* Hidden file input */}
-            <input
-              id="message-attachment"
-              type="file"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  handleAttachmentChange(Array.from(e.target.files));
-                  e.target.value = '';
-                }
-              }}
-              multiple
-            />
           </div>
           
           {/* Send Button */}
