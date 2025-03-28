@@ -45,11 +45,12 @@ export default function BusinessesPage() {
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
   
+  // Fixed type definition to allow possibly undefined values
   const [filters, setFilters] = useState({
     category: initialCategory,
     tags: initialTag ? [initialTag] : [],
-    country: undefined,
-    region: undefined,
+    country: undefined as string | undefined,
+    region: undefined as string | undefined,
   });
 
   // Fetch businesses, categories, and tags

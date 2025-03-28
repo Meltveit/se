@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
-import { Conversation, Message } from '@/types/message'; // Ensure this matches your intended Message type
+import { Conversation, Message } from '@/types/message'; 
 import { User, Business } from '@/types';
 import { getConversation, getMessages, markConversationAsRead, getBusiness, getUser } from '@/lib/firebase/db';
 import MessageForm from '@/components/messages/MessageForm';
@@ -16,9 +16,16 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import MainLayout from '@/components/layout/MainLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
 
-// Adjust Message type to match the one returned by getMessages if needed
-interface AdjustedMessage extends Message {
-  text?: string; // Make text optional if it's undefined in your Firestore data
+// Create a new interface instead of extending Message
+interface ConversationMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  text: string | undefined; // Make text optional
+  attachments?: any[];
+  read: boolean;
+  readAt?: any;
+  createdAt: any;
 }
 
 export default function ConversationPage() {
@@ -27,8 +34,8 @@ export default function ConversationPage() {
   const { user } = useAuth();
   
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<AdjustedMessage[]>([]); // Use AdjustedMessage to allow optional text
-  const [otherParticipant, setOtherParticipant] = useState<User | Business | null>(null); // Union type for User or Business
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
+  const [otherParticipant, setOtherParticipant] = useState<User | Business | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -58,7 +65,7 @@ export default function ConversationPage() {
         
         // Fetch messages
         const messagesData = await getMessages(conversationId as string);
-        setMessages(messagesData as AdjustedMessage[]); // Cast to AdjustedMessage
+        setMessages(messagesData as ConversationMessage[]); // Cast to ConversationMessage
         
         // Get other participant (assuming 1-on-1 conversation)
         const otherParticipantId = conversationData.participants.find(id => id !== user.uid);
@@ -94,11 +101,11 @@ export default function ConversationPage() {
   }, [messages]);
   
   // Handle sending a new message
-  const handleSendMessage = async (message: string, attachments?: File[]) => {
+  const handleSendMessage = async () => {
     // This will be implemented in the MessageForm component
     if (conversationId) {
       const updatedMessages = await getMessages(conversationId as string);
-      setMessages(updatedMessages as AdjustedMessage[]); // Cast to AdjustedMessage
+      setMessages(updatedMessages as ConversationMessage[]);
     }
   };
   

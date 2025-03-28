@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Message } from '@/types/message';
 import { User, Business } from '@/types';
 import { getUser, getBusiness } from '@/lib/firebase/db';
 
-// Type guard for å sjekke objekttypen
+// Type guard to check object type
 function isBusiness(obj: any): obj is Business {
   return obj && 'name' in obj && 'orgNumber' in obj;
 }
@@ -15,8 +14,20 @@ function isUser(obj: any): obj is User {
   return obj && 'firstName' in obj && 'email' in obj;
 }
 
+// Define a message interface that matches what we're working with
+interface ThreadMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  text?: string; // Make text optional
+  attachments?: any[];
+  read: boolean;
+  readAt?: any;
+  createdAt: any;
+}
+
 interface MessageThreadProps {
-  messages: Message[];
+  messages: ThreadMessage[];
   currentUserId: string;
 }
 
@@ -34,12 +45,12 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
     
     groups[dateString].push(message);
     return groups;
-  }, {} as { [date: string]: Message[] });
+  }, {} as { [date: string]: ThreadMessage[] });
   
   // Get unique sender IDs from messages
   useEffect(() => {
     const fetchUsers = async () => {
-      // Bruk Array.from() for å konvertere Set til Array for å unngå Set-iterasjon-feilen
+      // Use Array.from() to convert Set to Array to avoid Set-iteration errors
       const senderIds = Array.from(new Set(messages.map((message) => message.senderId)));
       
       const userPromises = senderIds.map(async (senderId) => {
@@ -48,7 +59,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
         
         try {
           // First try to get as business
-          let sender = await getBusiness(senderId);
+          let sender: User | Business | null = await getBusiness(senderId);
           
           // If not a business, try to get as user
           if (!sender) {
@@ -192,7 +203,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ messages, currentUserId }
                                   isCurrentUser ? 'bg-blue-700' : 'bg-gray-200'
                                 }`}
                               >
-                                
+                                <a
                                   href={attachment.url}
                                   target="_blank"
                                   rel="noopener noreferrer"

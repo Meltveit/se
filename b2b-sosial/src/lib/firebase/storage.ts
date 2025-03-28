@@ -84,6 +84,19 @@ export const uploadPostImage = async (
   return uploadFile(file, path, onProgress);
 };
 
+// Upload a message attachment
+export const uploadMessageAttachment = async (
+  conversationId: string,
+  file: File,
+  index: number,
+  onProgress?: (progress: number) => void
+): Promise<string> => {
+  const timestamp = Date.now();
+  const fileExtension = file.name.split('.').pop();
+  const path = `messages/${conversationId}/${timestamp}-${index}.${fileExtension}`;
+  return uploadFile(file, path, onProgress);
+};
+
 // Delete a file from Firebase Storage
 export const deleteFile = async (url: string): Promise<void> => {
   try {

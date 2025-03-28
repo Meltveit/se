@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import MainLayout from '@/components/layout/MainLayout';
-import Card from '@/components/common/Card';
 import Select from '@/components/common/Select';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
@@ -49,11 +48,11 @@ export default function MapPage() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const userPos = {
-            lat: position.coords.latitude, // Correct format - using lat
-            lng: position.coords.longitude // Correct format - using lng
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
           };
           setUserLocation(userPos);
-          setMapCenter(userPos); // Set map center to user location
+          setMapCenter(userPos);
           if (map) {
             map.setCenter(userPos);
             map.setZoom(DEFAULT_ZOOM);
@@ -70,7 +69,7 @@ export default function MapPage() {
         }
       );
     }
-  }, [map]); // Include map in dependencies so we can center it when it's loaded
+  }, [map]);
 
   // Fetch businesses and categories
   useEffect(() => {
@@ -92,7 +91,12 @@ export default function MapPage() {
         
         // Only fall back to a business location if we don't have user location
         if (!userLocation && businessesWithLocation.length > 0 && businessesWithLocation[0].location) {
-          setMapCenter(businessesWithLocation[0].location);
+          // Convert location format from { latitude, longitude } to { lat, lng }
+          const location = businessesWithLocation[0].location;
+          setMapCenter({
+            lat: location.latitude,
+            lng: location.longitude
+          });
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -166,8 +170,13 @@ export default function MapPage() {
     
     // Auto center map if we have filtered businesses
     if (filteredBusinesses.length > 0 && filteredBusinesses[0].location) {
-      setMapCenter(filteredBusinesses[0].location);
-      map?.setCenter(filteredBusinesses[0].location);
+      const location = filteredBusinesses[0].location;
+      const mapLocation = {
+        lat: location.latitude,
+        lng: location.longitude
+      };
+      setMapCenter(mapLocation);
+      if (map) map.setCenter(mapLocation);
     }
   };
 
@@ -181,12 +190,12 @@ export default function MapPage() {
     // Reset map to user location or default
     if (userLocation) {
       setMapCenter(userLocation);
-      map?.setCenter(userLocation);
+      if (map) map.setCenter(userLocation);
     } else {
       setMapCenter(DEFAULT_CENTER);
-      map?.setCenter(DEFAULT_CENTER);
+      if (map) map.setCenter(DEFAULT_CENTER);
     }
-    map?.setZoom(DEFAULT_ZOOM);
+    if (map) map.setZoom(DEFAULT_ZOOM);
   };
 
   // Get countries from businesses for the filter
@@ -314,11 +323,19 @@ export default function MapPage() {
                     )}
                     
                     {/* Markers for each business */}
-                    {filteredBusinesses.map((business) => (
-                      business.location && (
+                    {filteredBusinesses.map((business) => {
+                      if (!business.location) return null;
+                      
+                      // Convert business location to Google Maps format
+                      const position = {
+                        lat: business.location.latitude,
+                        lng: business.location.longitude
+                      };
+                      
+                      return (
                         <MarkerF
                           key={business.id}
-                          position={business.location}
+                          position={position}
                           onClick={() => handleMarkerClick(business.id)}
                           icon={{
                             url: business.logoUrl || '/marker-icon.png',
@@ -328,7 +345,7 @@ export default function MapPage() {
                           {/* Info Window when marker is clicked */}
                           {activeMarker === business.id && (
                             <InfoWindowF
-                              position={business.location}
+                              position={position}
                               onCloseClick={handleInfoWindowClose}
                             >
                               <div className="max-w-xs">
@@ -348,14 +365,17 @@ export default function MapPage() {
                             </InfoWindowF>
                           )}
                         </MarkerF>
-                      )
-                    ))}
+                      );
+                    })}
                   </GoogleMap>
                 )}
               </div>
             </div>
             
-            {/* Business List - rest of your code */}
+            {/* Business List - add your list component here */}
+            <div className="lg:w-1/3">
+              {/* Your business list component */}
+            </div>
           </div>
         </div>
       </div>

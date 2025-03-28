@@ -6,8 +6,14 @@ import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
 
-const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('');
+// Add a props interface
+interface LoginFormProps {
+  initialEmail?: string;
+  returnUrl?: string;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/dashboard' }) => {
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,7 +29,7 @@ const LoginForm: React.FC = () => {
     try {
       await signIn(email, password);
       showToast('Login successful!', 'success');
-      router.push('/dashboard');
+      router.push(returnUrl);
     } catch (error: any) {
       console.error('Login error:', error);
       const errorCode = error.code;
