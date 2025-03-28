@@ -13,10 +13,13 @@ import {
   serverTimestamp,
   Timestamp,
   DocumentData,
-  QueryConstraint
+  QueryConstraint,
+  WriteBatch,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from './config';
 import { Conversation, Message } from '@/types/message';
+import { Business, User } from '@/types';
 
 // Create a new conversation
 export const createConversation = async ({
@@ -46,10 +49,10 @@ export const createConversation = async ({
         hasAttachment: false,
         createdAt: serverTimestamp(),
       },
-      unreadCount: participants.reduce((acc, participantId) => {
+      unreadCount: participants.reduce((acc: Record<string, number>, participantId) => {
         acc[participantId] = 0;
         return acc;
-      }, {} as Record<string, number>),
+      }, {}),
       status: 'active',
       type: businessIds && businessIds.length > 0 ? 'business-to-business' : 'general',
       subject: subject || '',
@@ -152,7 +155,7 @@ export const markConversationAsRead = async (conversationId: string, userId: str
     }
     
     const conversation = conversationSnap.data();
-    const unreadCount = { ...conversation.unreadCount };
+    const unreadCount = { ...(conversation.unreadCount || {}) };
     
     // If the user has unread messages, mark them as read
     if (unreadCount[userId] && unreadCount[userId] > 0) {
@@ -173,16 +176,16 @@ export const markConversationAsRead = async (conversationId: string, userId: str
       
       const messagesSnapshot = await getDocs(q);
       
-      const batch = [];
+      const batch: WriteBatch = writeBatch(db);
       messagesSnapshot.forEach((messageDoc) => {
         const messageRef = doc(db, 'messages', messageDoc.id);
-        batch.push(updateDoc(messageRef, {
+        batch.update(messageRef, {
           read: true,
           readAt: serverTimestamp(),
-        }));
+        });
       });
       
-      await Promise.all(batch);
+      await batch.commit();
     }
   } catch (error) {
     console.error('Error marking conversation as read:', error);
@@ -249,7 +252,7 @@ export const sendMessage = async ({
     
     const conversation = conversationSnap.data();
     const participants = conversation.participants || [];
-    const unreadCount = { ...conversation.unreadCount };
+    const unreadCount = { ...(conversation.unreadCount || {}) };
     
     // Increment unread count for all participants except sender
     participants.forEach((participantId: string) => {
@@ -277,25 +280,25 @@ export const sendMessage = async ({
 };
 
 // Search for users to message
-export const searchUsers = async (query: string, limit: number = 5): Promise<any[]> => {
+export const searchUsers = async (queryText: string, limitNum: number = 5): Promise<User[]> => {
   try {
     // In a real implementation, you would have a more sophisticated search
     // For now, we'll use a simple startsWith query on the firstName and lastName fields
-    const firstNameQuery = query.toLowerCase();
-    const lastNameQuery = query.toLowerCase();
+    const firstNameQuery = queryText.toLowerCase();
+    const lastNameQuery = queryText.toLowerCase();
     
     const firstNameQ = query(
       collection(db, 'users'),
       where('firstName', '>=', firstNameQuery),
-      where('firstName', '<=', firstNameQuery + '\uf8ff'),
-      limit(limit)
+      where('firstName', '<=', firstNameQuery + String.fromCharCode(0xf8ff)),
+      limit(limitNum)
     );
     
     const lastNameQ = query(
       collection(db, 'users'),
       where('lastName', '>=', lastNameQuery),
-      where('lastName', '<=', lastNameQuery + '\uf8ff'),
-      limit(limit)
+      where('lastName', '<=', lastNameQuery + String.fromCharCode(0xf8ff)),
+      limit(limitNum)
     );
     
     const [firstNameSnapshot, lastNameSnapshot] = await Promise.all([
@@ -303,21 +306,23 @@ export const searchUsers = async (query: string, limit: number = 5): Promise<any
       getDocs(lastNameQ)
     ]);
     
-    const userMap = new Map();
+    const userMap = new Map<string, User>();
     
     // Add users from firstName query
-    firstNameSnapshot.forEach((doc) => {
-      userMap.set(doc.id, {
-        id: doc.id,
-        ...doc.data()
+    firstNameSnapshot.forEach((docSnapshot) => {
+      const userData = docSnapshot.data() as User;
+      userMap.set(docSnapshot.id, {
+        ...userData,
+        id: docSnapshot.id
       });
     });
     
     // Add users from lastName query
-    lastNameSnapshot.forEach((doc) => {
-      userMap.set(doc.id, {
-        id: doc.id,
-        ...doc.data()
+    lastNameSnapshot.forEach((docSnapshot) => {
+      const userData = docSnapshot.data() as User;
+      userMap.set(docSnapshot.id, {
+        ...userData,
+        id: docSnapshot.id
       });
     });
     
@@ -330,26 +335,27 @@ export const searchUsers = async (query: string, limit: number = 5): Promise<any
 };
 
 // Search for businesses to message
-export const searchBusinesses = async (query: string, limit: number = 5): Promise<any[]> => {
+export const searchBusinesses = async (queryText: string, limitNum: number = 5): Promise<Business[]> => {
   try {
     // In a real implementation, you would have a more sophisticated search
     // For now, we'll use a simple startsWith query on the name field
-    const nameQuery = query.toLowerCase();
+    const nameQuery = queryText.toLowerCase();
     
     const q = query(
       collection(db, 'businesses'),
       where('name', '>=', nameQuery),
-      where('name', '<=', nameQuery + '\uf8ff'),
-      limit(limit)
+      where('name', '<=', nameQuery + String.fromCharCode(0xf8ff)),
+      limit(limitNum)
     );
     
     const snapshot = await getDocs(q);
     
-    const businesses: any[] = [];
-    snapshot.forEach((doc) => {
+    const businesses: Business[] = [];
+    snapshot.forEach((docSnapshot) => {
+      const businessData = docSnapshot.data() as Business;
       businesses.push({
-        id: doc.id,
-        ...doc.data()
+        ...businessData,
+        id: docSnapshot.id
       });
     });
     
