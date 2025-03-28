@@ -1,0 +1,47 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "users": {
+      "$uid": {
+        // Tillat brukere å lese og skrive til sin egen brukernode
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "businesses": {
+      "$businessId": {
+        // Tillat lesing av alle virksomheter for alle autentiserte brukere
+        ".read": "auth != null",
+        // Tillat skriving bare for eieren av virksomheten
+        ".write": "auth != null && root.child('businesses').child($businessId).child('ownerId').val() === auth.uid"
+      }
+    },
+    "conversations": {
+      "$conversationId": {
+        // Tillat lesing og skriving bare for deltakere i samtalen
+        ".read": "auth != null && root.child('conversations').child($conversationId).child('participants').val().contains(auth.uid)",
+        ".write": "auth != null && root.child('conversations').child($conversationId).child('participants').val().contains(auth.uid)"
+      }
+    },
+    "messages": {
+      "$messageId": {
+        // Tillat lesing og skriving bare for deltakere i den tilhørende samtalen
+        ".read": "auth != null && root.child('messages').child($messageId).child('conversationId').exists() && 
+                  root.child('conversations').child(root.child('messages').child($messageId).child('conversationId').val()).child('participants').val().contains(auth.uid)",
+        ".write": "auth != null && 
+                   (data.child('senderId').val() === auth.uid || 
+                    !data.exists())"
+      }
+    },
+    "posts": {
+      ".read": "auth != null",
+      "$postId": {
+        // Tillat skriving bare for eieren av virksomheten som laget innlegget
+        ".write": "auth != null && 
+                   (data.child('authorId').val() === auth.uid || 
+                    !data.exists() && newData.child('authorId').val() === auth.uid)"
+      }
+    }
+  }
+}

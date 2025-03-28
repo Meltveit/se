@@ -160,6 +160,10 @@ const PostForm: React.FC<PostFormProps> = ({
         imageUrls: additionalImageUrls,
         status: 'published' as const,
         authorId: businessId,
+        businessId, // Add businessId
+        viewCount: existingPost?.viewCount || 0, // Default to 0 if not provided
+        likeCount: existingPost?.likeCount || 0, // Default to 0 if not provided
+        commentCount: existingPost?.commentCount || 0, // Default to 0 if not provided
       };
 
       let postId;
@@ -226,7 +230,7 @@ const PostForm: React.FC<PostFormProps> = ({
         <div className="rounded-md shadow-sm">
           <ReactQuill
             value={content}
-            onChange={setContent}
+            onChange={(value) => setContent(value)}
             modules={modules}
             formats={formats}
             placeholder="Write your post content here..."

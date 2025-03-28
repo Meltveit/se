@@ -1,14 +1,22 @@
-declare module 'react-quill' {
-    import React from 'react';
+declare module 'react-quill/dist/quill.snow.css' {
+    const styles: string;
+    export default styles;
+  }
   
-    interface ReactQuillProps {
+  // Additional type for Quill modules if needed
+  declare module 'react-quill' {
+    export interface ReactQuillProps {
       value: string;
       onChange: (content: string) => void;
-      modules?: Record<string, any>;
+      modules?: {
+        toolbar?: any[];
+        [key: string]: any;
+      };
       formats?: string[];
       placeholder?: string;
       className?: string;
-      // Legg til andre props du trenger her
+      theme?: 'snow' | 'bubble';
+      readOnly?: boolean;
     }
   
     const ReactQuill: React.FC<ReactQuillProps>;

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { getBusiness } from '@/lib/firebase/db';
+import { getBusinesses, getBusiness } from '@/lib/firebase/db';
 import { Business } from '@/types';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';

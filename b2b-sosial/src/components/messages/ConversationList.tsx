@@ -1,3 +1,4 @@
+// src/components/messages/ConversationList.tsx
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,15 +29,20 @@ const ConversationList: React.FC<ConversationListProps> = ({ conversations }) =>
             // Fetch participant details
             const participantDetails = await Promise.all(
               otherParticipantIds.map(async (participantId) => {
-                // First try to get as business
-                let participant = await getBusiness(participantId);
-                
-                // If not a business, try to get as user
-                if (!participant) {
-                  participant = await getUser(participantId);
+                try {
+                  // First try to get as business
+                  let participant: Business | User | null = await getBusiness(participantId);
+                  
+                  // If not a business, try to get as user
+                  if (!participant) {
+                    participant = await getUser(participantId);
+                  }
+                  
+                  return participant;
+                } catch (error) {
+                  console.error(`Error fetching participant ${participantId}:`, error);
+                  return null;
                 }
-                
-                return participant;
               })
             );
             

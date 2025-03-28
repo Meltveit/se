@@ -1,27 +1,29 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthLayout from '@/components/layout/AuthLayout';
 import LoginForm from '@/components/auth/LoginForm';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-export default function LoginPage() {
+// Component that uses useSearchParams
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams?.get('returnUrl') || '/dashboard';
   const email = searchParams?.get('email') || '';
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Redirect authenticated users
   useEffect(() => {
-    if (!loading && user) {
+    if (!authLoading && user) {
       router.push(returnUrl);
     }
-  }, [user, loading, router, returnUrl]);
+  }, [user, authLoading, router, returnUrl]);
 
-  if (loading || user) {
+  if (authLoading || user) {
     return (
       <AuthLayout title="Sign In">
         <div className="flex justify-center py-6">
@@ -70,5 +72,20 @@ export default function LoginPage() {
         </div>
       </div>
     </AuthLayout>
+  );
+}
+
+// Main component with suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <AuthLayout title="Sign In">
+        <div className="flex justify-center py-6">
+          <LoadingSpinner size="md" />
+        </div>
+      </AuthLayout>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

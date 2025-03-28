@@ -1,3 +1,4 @@
+// src/components/messages/MessageForm.tsx
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -5,6 +6,15 @@ import { sendMessage } from '@/lib/firebase/db';
 import { uploadMessageAttachment } from '@/lib/firebase/storage';
 import Button from '@/components/common/Button';
 import FileUpload, { FileUploadRef } from '@/components/common/FileUpload';
+
+// Define the attachment object type
+interface AttachmentObject {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+}
 
 interface MessageFormProps {
   conversationId: string;
@@ -46,7 +56,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ conversationId, onMessageSent
       setIsSending(true);
       
       // Upload attachments if any
-      let attachmentObjects = [];
+      let attachmentObjects: AttachmentObject[] = [];
       if (attachments.length > 0) {
         setIsUploading(true);
         

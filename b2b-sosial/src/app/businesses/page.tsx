@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getBusinesses, getCategories, getTags } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
@@ -31,7 +31,8 @@ const regions: Region[] = [
   { code: 'ny', name: 'New York', countryCode: 'us' },
 ];
 
-export default function BusinessesPage() {
+// Extract the search params logic into a client component
+function BusinessContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams?.get('category') || undefined;
   const initialTag = searchParams?.get('tag') || undefined;
@@ -121,99 +122,108 @@ export default function BusinessesPage() {
   };
 
   return (
-    <MainLayout>
-      <div className="bg-white">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Businesses Directory</h1>
+    <div className="bg-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Businesses Directory</h1>
+        </div>
+        
+        <div className="lg:flex lg:gap-8">
+          {/* Sidebar with filters */}
+          <div className="lg:w-1/4 mb-6 lg:mb-0 space-y-6">
+            <BusinessFilters
+              categories={categories}
+              tags={tags}
+              countries={countries}
+              regions={regions}
+              selectedCategory={filters.category}
+              selectedTags={filters.tags}
+              selectedCountry={filters.country}
+              selectedRegion={filters.region}
+              onFilterChange={handleFilterChange}
+            />
+            
+            {/* Ad in sidebar */}
+            <div className="mt-6">
+              <AdPlacement type="business-list-sidebar" className="mx-auto" />
+            </div>
           </div>
           
-          <div className="lg:flex lg:gap-8">
-            {/* Sidebar with filters */}
-            <div className="lg:w-1/4 mb-6 lg:mb-0 space-y-6">
-              <BusinessFilters
-                categories={categories}
-                tags={tags}
-                countries={countries}
-                regions={regions}
-                selectedCategory={filters.category}
-                selectedTags={filters.tags}
-                selectedCountry={filters.country}
-                selectedRegion={filters.region}
-                onFilterChange={handleFilterChange}
-              />
-              
-              {/* Ad in sidebar */}
-              <div className="mt-6">
-                <AdPlacement type="business-list-sidebar" className="mx-auto" />
+          {/* Main content */}
+          <div className="lg:w-3/4">
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <LoadingSpinner size="lg" />
               </div>
-            </div>
-            
-            {/* Main content */}
-            <div className="lg:w-3/4">
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <LoadingSpinner size="lg" />
+            ) : error ? (
+              <div className="text-center py-12">
+                <div className="text-red-500 mb-4">{error}</div>
+                <Button onClick={() => window.location.reload()} variant="outline">
+                  Try Again
+                </Button>
+              </div>
+            ) : businesses.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+                <p className="text-gray-500">No businesses found matching your criteria.</p>
+                {Object.values(filters).some(Boolean) && (
+                  <p className="mt-2 text-sm text-gray-500">Try adjusting your filters or check back later.</p>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {businesses.slice(0, 3).map((business) => (
+                    <BusinessCard key={business.id} business={business} />
+                  ))}
                 </div>
-              ) : error ? (
-                <div className="text-center py-12">
-                  <div className="text-red-500 mb-4">{error}</div>
-                  <Button onClick={() => window.location.reload()} variant="outline">
-                    Try Again
-                  </Button>
+                
+                {/* Mid-listing ad */}
+                <div className="my-6 flex justify-center">
+                  <AdPlacement type="news-feed-inline" />
                 </div>
-              ) : businesses.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                  <p className="text-gray-500">No businesses found matching your criteria.</p>
-                  {Object.values(filters).some(Boolean) && (
-                    <p className="mt-2 text-sm text-gray-500">Try adjusting your filters or check back later.</p>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {businesses.slice(0, 3).map((business) => (
+                
+                {/* Remaining businesses */}
+                {businesses.length > 3 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+                    {businesses.slice(3).map((business) => (
                       <BusinessCard key={business.id} business={business} />
                     ))}
                   </div>
-                  
-                  {/* Mid-listing ad */}
-                  <div className="my-6 flex justify-center">
-                    <AdPlacement type="news-feed-inline" />
+                )}
+                
+                {hasMore && (
+                  <div className="mt-8 flex justify-center">
+                    <Button
+                      onClick={handleLoadMore}
+                      variant="outline"
+                      isLoading={loadingMore}
+                      disabled={loadingMore}
+                    >
+                      Load More
+                    </Button>
                   </div>
-                  
-                  {/* Remaining businesses */}
-                  {businesses.length > 3 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
-                      {businesses.slice(3).map((business) => (
-                        <BusinessCard key={business.id} business={business} />
-                      ))}
-                    </div>
-                  )}
-                  
-                  {hasMore && (
-                    <div className="mt-8 flex justify-center">
-                      <Button
-                        onClick={handleLoadMore}
-                        variant="outline"
-                        isLoading={loadingMore}
-                        disabled={loadingMore}
-                      >
-                        Load More
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {/* Bottom ad */}
-                  <div className="mt-12 flex justify-center">
-                    <AdPlacement type="footer-banner" />
-                  </div>
-                </>
-              )}
-            </div>
+                )}
+                
+                {/* Bottom ad */}
+                <div className="mt-12 flex justify-center">
+                  <AdPlacement type="footer-banner" />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Wrap the client component in Suspense
+export default function BusinessesPage() {
+  return (
+    <MainLayout>
+      <Suspense fallback={<div className="flex justify-center py-12"><LoadingSpinner size="lg" /></div>}>
+        <BusinessContent />
+      </Suspense>
     </MainLayout>
   );
 }
