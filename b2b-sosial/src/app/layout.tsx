@@ -24,6 +24,15 @@ export default function RootLayout({
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
+        
+        {/* Media.net Script (Optional, can be added dynamically) */}
+        <Script
+          id="medianet-script"
+          strategy="afterInteractive"
+          src={`https://contextual.media.net/dmedianet.js?cid=${
+            process.env.NEXT_PUBLIC_MEDIANET_PUBLISHER_ID || ''
+          }`}
+        />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>

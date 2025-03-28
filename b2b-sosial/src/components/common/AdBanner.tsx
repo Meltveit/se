@@ -1,15 +1,23 @@
-"use client";
-
 import React, { useEffect, useRef } from 'react';
 
-// Add TypeScript declaration for window.adsbygoogle
+// Utvid Window-grensesnittet med ekstra egenskaper
 declare global {
   interface Window {
-    adsbygoogle: any[];
+    adsbygoogle?: any[];
+    medianet_width?: number;
+    medianet_height?: number;
+    medianet_crid?: string;
+    medianet_versionId?: string;
+    Media_NET?: {
+      render: () => void;
+    };
   }
 }
 
+export type AdPlatform = 'google' | 'medianet';
+
 interface AdBannerProps {
+  platform: AdPlatform;
   adSlot: string;
   width?: number;
   height?: number;
@@ -18,6 +26,7 @@ interface AdBannerProps {
 }
 
 const AdBanner: React.FC<AdBannerProps> = ({
+  platform,
   adSlot,
   width = 728,
   height = 90,
@@ -27,29 +36,76 @@ const AdBanner: React.FC<AdBannerProps> = ({
   const adRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if Google AdSense is loaded
-    if (window.adsbygoogle) {
+    if (platform === 'google' && window.adsbygoogle) {
       try {
-        // Push the ad to Google AdSense
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (error) {
-        console.error('AdSense error:', error);
+        console.error('Google AdSense error:', error);
       }
-    } else {
-      console.log('AdSense not loaded yet');
     }
-  }, [adSlot]);
+  }, [platform, adSlot]);
+
+  const renderGoogleAd = () => (
+    <ins
+      className="adsbygoogle"
+      style={{ 
+        display: 'block', 
+        width: format === 'auto' ? '100%' : `${width}px`, 
+        height: format === 'auto' ? 'auto' : `${height}px` 
+      }}
+      data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+      data-ad-slot={adSlot}
+      data-ad-format={format}
+      data-full-width-responsive="true"
+    />
+  );
+
+  const renderMediaNetAd = () => (
+    <div 
+      id={`medianet_${adSlot}`}
+      style={{ 
+        width: `${width}px`, 
+        height: `${height}px` 
+      }}
+    />
+  );
+
+  // Load Media.net script
+  useEffect(() => {
+    if (platform === 'medianet') {
+      const script = document.createElement('script');
+      script.src = 'https://contextual.media.net/dmedianet.js?cid=' + 
+        process.env.NEXT_PUBLIC_MEDIANET_PUBLISHER_ID;
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        try {
+          // Sjekk at disse egenskapene eksisterer før de settes
+          if (window) {
+            window.medianet_width = width;
+            window.medianet_height = height;
+            window.medianet_crid = adSlot;
+            window.medianet_versionId = 'test';
+            
+            if (window.Media_NET) {
+              window.Media_NET.render();
+            }
+          }
+        } catch (error) {
+          console.error('Media.net rendering error:', error);
+        }
+      };
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [platform, adSlot, width, height]);
 
   return (
     <div className={`ad-container overflow-hidden ${className}`}>
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block', width: format === 'auto' ? '100%' : `${width}px`, height: format === 'auto' ? 'auto' : `${height}px` }}
-        data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx'}
-        data-ad-slot={adSlot}
-        data-ad-format={format}
-        data-full-width-responsive="true"
-      />
+      {platform === 'google' ? renderGoogleAd() : renderMediaNetAd()}
     </div>
   );
 };
