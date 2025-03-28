@@ -33,7 +33,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
   return (
     <div className="relative mb-8">
       {/* Banner Image */}
-      <div className="h-48 sm:h-64 lg:h-80 bg-gray-200 relative">
+      <div className="h-48 sm:h-64 lg:h-80 bg-gray-200 relative overflow-hidden">
         {business.bannerUrl ? (
           <Image
             src={business.bannerUrl}
@@ -41,6 +41,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
             fill
             className="object-cover"
             priority
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1200px"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-700">
@@ -63,6 +64,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
                       alt={business.name}
                       fill
                       className="object-cover"
+                      sizes="96px"
                     />
                   </div>
                 ) : (
@@ -75,7 +77,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
               {/* Business Info */}
               <div className="mt-4 sm:mt-0 sm:ml-6">
                 <div className="flex items-center">
-                  <h1 className="text-2xl font-bold text-gray-900">{business.name}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 truncate max-w-[300px]">{business.name}</h1>
                   {isComplete && business.verified && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +108,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
                 </div>
 
                 {business.shortDescription && (
-                  <p className="mt-2 text-sm text-gray-600 max-w-2xl">{business.shortDescription}</p>
+                  <p className="mt-2 text-sm text-gray-600 max-w-2xl line-clamp-2">{business.shortDescription}</p>
                 )}
 
                 {/* Tags */}

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/contexts/ToastContext';
 
 const Header: React.FC = () => {
-  const { user, userProfile, isBusinessOwner, loading } = useAuth();
+  const { user, userProfile, isBusinessOwner, businessId, loading } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -94,6 +94,15 @@ const Header: React.FC = () => {
 
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    {isBusinessOwner && (
+                      <Link
+                        href={`/businesses/${businessId}`}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setProfileMenuOpen(false)}
+                      >
+                        Business Profile
+                      </Link>
+                    )}
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -202,16 +211,36 @@ const Header: React.FC = () => {
 
               {user ? (
                 <>
-                  <Link href="/profile" className="py-2 hover:text-blue-100">
+                  {isBusinessOwner && (
+                    <>
+                      <Link 
+                        href={`/businesses/${businessId}`} 
+                        className="py-2 hover:text-blue-100"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Business Profile
+                      </Link>
+                      <Link 
+                        href="/dashboard" 
+                        className="py-2 hover:text-blue-100"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Business Dashboard
+                      </Link>
+                    </>
+                  )}
+                  <Link 
+                    href="/profile" 
+                    className="py-2 hover:text-blue-100"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     Your Profile
                   </Link>
-                  {isBusinessOwner && (
-                    <Link href="/dashboard" className="py-2 hover:text-blue-100">
-                      Business Dashboard
-                    </Link>
-                  )}
                   <button
-                    onClick={handleSignOut}
+                    onClick={() => {
+                      handleSignOut();
+                      setMobileMenuOpen(false);
+                    }}
                     className="text-left py-2 hover:text-blue-100"
                   >
                     Sign out

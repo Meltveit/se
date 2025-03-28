@@ -46,14 +46,16 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
               />
             </div>
           ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-800">
               <span className="font-bold">{initial}</span>
             </div>
           )}
           
-          <div className="ml-3">
+          <div className="ml-3 min-w-0 flex-1">
             <Link href={`/businesses/${business.id}`}>
-              <h3 className="font-bold hover:text-blue-600 transition-colors">{business.name}</h3>
+              <h3 className="font-bold hover:text-blue-600 transition-colors truncate max-w-full">
+                {business.name}
+              </h3>
             </Link>
             
             {business.tags && business.tags.length > 0 && (
@@ -74,7 +76,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
           </div>
         </div>
         
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
           {business.shortDescription || business.description
             ? (business.shortDescription || business.description?.substring(0, 120) + (business.description && business.description.length > 120 ? '...' : ''))
             : 'No description available.'}
