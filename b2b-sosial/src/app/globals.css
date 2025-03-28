@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add this line at the top of your CSS file to import React Quill styles */
+@import 'react-quill/dist/quill.snow.css';
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 250, 250, 250;

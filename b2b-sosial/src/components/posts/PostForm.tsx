@@ -6,11 +6,7 @@ import { uploadPostImage } from '@/lib/firebase/storage';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
-import dynamic from 'next/dynamic';
-
-// Dynamic import for RichTextEditor (react-quill)
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+import RichTextEditor from '@/components/common/RichTextEditor';
 
 interface PostFormProps {
   businessId: string;
@@ -45,24 +41,6 @@ const PostForm: React.FC<PostFormProps> = ({
 
   // Check if editing an existing post
   const isEditing = !!existingPost;
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      ['link'],
-      ['clean'],
-    ],
-  };
-
-  const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'indent',
-    'link',
-  ];
 
   // Add tag on Enter or comma
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -226,11 +204,9 @@ const PostForm: React.FC<PostFormProps> = ({
           Content
         </label>
         <div className="rounded-md shadow-sm">
-          <ReactQuill
+          <RichTextEditor
             value={content}
             onChange={(value) => setContent(value)}
-            modules={modules}
-            formats={formats}
             placeholder="Write your post content here..."
             className="h-64"
           />

@@ -1,0 +1,40 @@
+[debug] [2025-03-28T23:51:54.380Z] ----------------------------------------------------------------------
+[debug] [2025-03-28T23:51:54.395Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\meltv\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-03-28T23:51:54.396Z] CLI Version:   13.35.0
+[debug] [2025-03-28T23:51:54.396Z] Platform:      win32
+[debug] [2025-03-28T23:51:54.396Z] Node Version:  v22.14.0
+[debug] [2025-03-28T23:51:54.397Z] Time:          Sat Mar 29 2025 00:51:54 GMT+0100 (Central European Standard Time)
+[debug] [2025-03-28T23:51:54.397Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-28T23:51:54.795Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-28T23:51:54.796Z] > authorizing via signed-in user (Christopher@b2bsocial.no)
+[debug] [2025-03-28T23:51:54.797Z] [iam] checking project b2bsocial for permissions ["cloudconfig.configs.get","cloudconfig.configs.update","cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2025-03-28T23:51:54.799Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:54.800Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:54.801Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions [none]
+[debug] [2025-03-28T23:51:54.801Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions x-goog-quota-user=projects/b2bsocial
+[debug] [2025-03-28T23:51:54.802Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions {"permissions":["cloudconfig.configs.get","cloudconfig.configs.update","cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-03-28T23:51:55.158Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions 200
+[debug] [2025-03-28T23:51:55.159Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions {"permissions":["cloudconfig.configs.get","cloudconfig.configs.update","cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-03-28T23:51:55.159Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:55.159Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:55.159Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/b2bsocial/serviceAccounts/b2bsocial@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-03-28T23:51:55.159Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/b2bsocial/serviceAccounts/b2bsocial@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-03-28T23:51:56.057Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/b2bsocial/serviceAccounts/b2bsocial@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-03-28T23:51:56.057Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/b2bsocial/serviceAccounts/b2bsocial@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-03-28T23:51:56.058Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:56.058Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:56.058Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial [none]
+[debug] [2025-03-28T23:51:56.351Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial 200
+[debug] [2025-03-28T23:51:56.351Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial {"projectId":"b2bsocial","projectNumber":"510666935896","displayName":"b2bsocial","name":"projects/b2bsocial","resources":{"hostingSite":"b2bsocial","realtimeDatabaseInstance":"b2bsocial-default-rtdb"},"state":"ACTIVE","etag":"1_09c2ed54-cca0-45c1-af7f-b83cdcd1422c"}
+[debug] [2025-03-28T23:51:56.352Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:56.352Z] Checked if tokens are valid: true, expires at: 1743208567683
+[debug] [2025-03-28T23:51:56.352Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial [none]
+[debug] [2025-03-28T23:51:56.587Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial 200
+[debug] [2025-03-28T23:51:56.587Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial {"projectId":"b2bsocial","projectNumber":"510666935896","displayName":"b2bsocial","name":"projects/b2bsocial","resources":{"hostingSite":"b2bsocial","realtimeDatabaseInstance":"b2bsocial-default-rtdb"},"state":"ACTIVE","etag":"1_09c2ed54-cca0-45c1-af7f-b83cdcd1422c"}
+[info] 
+[info] === Deploying to 'b2bsocial'...
+[info] 
+[info] i  deploying database, storage, firestore, functions, hosting, remoteconfig 
+[info] Running command: npm run lint
+[info] Running command: npm run build

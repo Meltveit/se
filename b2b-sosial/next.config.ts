@@ -7,6 +7,8 @@ const nextConfig = {
       'lh3.googleusercontent.com'
     ],
   },
+  // Allow importing CSS from node_modules
+  transpilePackages: ['react-quill'],
   // For production deployment
   // output: 'export',
   // images: {
