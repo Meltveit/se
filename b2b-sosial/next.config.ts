@@ -1,19 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Endre output til export for å generere statiske filer
+  output: 'export',
   images: {
-    domains: [
-      'firebasestorage.googleapis.com',
-      'lh3.googleusercontent.com'
-    ],
+    unoptimized: true,
   },
-  // Allow importing CSS from node_modules
   transpilePackages: ['react-quill'],
-  // For production deployment
-  // output: 'export',
-  // images: {
-  //   unoptimized: true,
-  // },
 };
 
 module.exports = nextConfig;
