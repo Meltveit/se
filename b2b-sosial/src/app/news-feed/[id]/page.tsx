@@ -1,4 +1,4 @@
-import { Metadata, ResolvingMetadata } from 'next';
+import { Metadata } from 'next';
 import { getPost, getBusiness, getPosts } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
 import PostDetailClient from '@/components/posts/PostDetailClient';
@@ -8,7 +8,6 @@ import { Post } from '@/types';
 // Type for page props
 type PageProps = {
   params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 // Generate static params
@@ -19,17 +18,14 @@ export async function generateStaticParams() {
     return postsData.posts.map((post: Post) => ({
       id: post.id,
     }));
-  } catch (_error) {
-    console.error('Error fetching posts for static generation');
+  } catch (error) {
+    console.error('Error fetching posts for static generation:', error);
     return [];
   }
 }
 
 // Generate metadata
-export async function generateMetadata(
-  { params }: PageProps,
-  _parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const postData = await getPost(params.id);
     
@@ -49,7 +45,8 @@ export async function generateMetadata(
         images: postData.coverImage ? [{ url: postData.coverImage }] : [],
       },
     };
-  } catch (_error) {
+  } catch (error) {
+    console.error('Error generating metadata:', error);
     return {
       title: 'Error Loading Post',
       description: 'An error occurred while loading the post.'
@@ -78,7 +75,8 @@ export default async function PostDetailPage({ params }: PageProps) {
         />
       </MainLayout>
     );
-  } catch (_error) {
+  } catch (error) {
+    console.error('Error loading post:', error);
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-8">

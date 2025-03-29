@@ -64,8 +64,10 @@ export default function MapContent() {
             label: cat.name
           }))
         ]);
-      } catch (_error) {
-        console.error('Error fetching categories');
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        // Set empty categories as fallback
+        setCategories([{ value: '', label: 'All Categories' }]);
       }
     };
     fetchCategories();
@@ -77,7 +79,6 @@ export default function MapContent() {
       try {
         // Create query constraints with proper Firebase typing
         const queryConstraints: QueryConstraint[] = [];
-
         if (selectedCategory) {
           queryConstraints.push(where('category', '==', selectedCategory));
         }
@@ -87,15 +88,12 @@ export default function MapContent() {
         if (selectedRegion) {
           queryConstraints.push(where('region', '==', selectedRegion));
         }
-
         const result = await getBusinesses(100, undefined, queryConstraints);
         const businesses = result.businesses.filter(business => 
           !searchQuery || 
           business.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
-
         setFilteredBusinesses(businesses);
-
         // Update map center if businesses exist
         if (businesses.length > 0 && businesses[0].location) {
           setMapCenter({
@@ -103,8 +101,9 @@ export default function MapContent() {
             lng: businesses[0].location.longitude
           });
         }
-      } catch (_error) {
-        console.error('Error fetching businesses');
+      } catch (error) {
+        console.error('Error fetching businesses:', error);
+        setFilteredBusinesses([]);
       }
     };
 
@@ -130,8 +129,9 @@ export default function MapContent() {
           setUserLocation(location);
           setMapCenter(location);
         },
-        (_error) => {
-          console.error('Error getting location');
+        (error) => {
+          console.error('Error getting location:', error);
+          // Fallback to default location or do nothing
         }
       );
     }
