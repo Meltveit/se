@@ -32,7 +32,7 @@ export default function MapContent() {
     libraries: ['places']
   });
 
-  // Initialize state with search params
+  // Initialize state with search params, handle null properly
   const [categories, setCategories] = useState<{value: string, label: string}[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams?.get('category') || ''

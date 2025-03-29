@@ -1,3 +1,4 @@
+// src/app/businesses/page.tsx
 import { Metadata } from 'next';
 import { where, QueryConstraint } from 'firebase/firestore';
 import { getBusinesses, getCategories, getTags } from '@/lib/firebase/db';
@@ -8,6 +9,13 @@ import Button from '@/components/common/Button';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 import { COUNTRIES } from '@/lib/geographic-data';
 import { Country } from '@/types';
+
+// Define the search params type
+type BusinessesSearchParams = {
+  category?: string;
+  tag?: string;
+  country?: string;
+};
 
 // Mock data for regions 
 const regions = [
@@ -27,14 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// Fix the page props to match what Next.js expects
 export default async function BusinessesPage({ 
   searchParams 
 }: { 
-  searchParams?: { 
-    category?: string; 
-    tag?: string; 
-    country?: string; 
-  }
+  searchParams?: BusinessesSearchParams;
 }) {
   try {
     // Prepare query constraints

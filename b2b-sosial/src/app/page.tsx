@@ -7,8 +7,10 @@ import BusinessCard from '@/components/businesses/BusinessCard';
 import PostCard from '@/components/posts/PostCard';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 
+// Make sure to set the appropriate export directives for Next.js
 export const dynamic = 'force-dynamic';
 
+// Define the page component with no props
 export default async function HomePage() {
   // Fetch featured businesses, latest posts, and categories
   const featuredBusinesses = await getFeaturedBusinesses(6);
@@ -39,6 +41,7 @@ export default async function HomePage() {
         </div>
       </div>
 
+      {/* Rest of your component... */}
       {/* Featured Businesses Section */}
       <div className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -70,7 +73,7 @@ export default async function HomePage() {
         </div>
       </div>
       
-      {/* Subtil annonse etter featued bedrifter */}
+      {/* Subtle ad after featured businesses */}
       <div className="container mx-auto px-4">
         <SubtleAdPlacement type="content-bottom" />
       </div>
@@ -130,7 +133,7 @@ export default async function HomePage() {
                 <PostCard key={post.id} post={post} />
               ))}
               
-              {/* Integrert annonse i feeden, ser ut som et vanlig innlegg */}
+              {/* Integrated ad in the feed, looks like a regular post */}
               <div className="md:col-span-1">
                 <SubtleAdPlacement type="sidebar-native" className="h-full" />
               </div>
@@ -208,7 +211,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Diskret footer-annonse */}
+      {/* Discrete footer ad */}
       <div className="container mx-auto">
         <SubtleAdPlacement type="footer-discrete" />
       </div>
