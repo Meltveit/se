@@ -4,15 +4,17 @@ import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Define proper types for the params
-type BusinessPageParams = {
-  params: {
-    id: string;
-  };
-};
+// Use a type that matches Next.js's expected interface
+export interface PageProps {
+  params: { id: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}
 
 // For generateMetadata
-export async function generateMetadata({ params }: BusinessPageParams): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent?: Promise<Metadata>
+): Promise<Metadata> {
   try {
     const business = await getBusiness(params.id);
     
@@ -41,8 +43,8 @@ export async function generateMetadata({ params }: BusinessPageParams): Promise<
   }
 }
 
-// Fix the page component with the correct params type
-export default async function BusinessDetailPage({ params }: BusinessPageParams) {
+// Make sure to use the correct interface for the component props
+export default async function BusinessDetailPage({ params }: PageProps) {
   try {
     const business = await getBusiness(params.id);
     

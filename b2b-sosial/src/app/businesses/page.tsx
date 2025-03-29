@@ -11,11 +11,17 @@ import { COUNTRIES } from '@/lib/geographic-data';
 import { Country } from '@/types';
 
 // Define the search params type
-type BusinessesSearchParams = {
+interface BusinessesSearchParams {
   category?: string;
   tag?: string;
   country?: string;
-};
+}
+
+// Use the Next.js PageProps interface
+export interface PageProps {
+  params?: any;
+  searchParams?: BusinessesSearchParams;
+}
 
 // Mock data for regions 
 const regions = [
@@ -36,11 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 // Fix the page props to match what Next.js expects
-export default async function BusinessesPage({ 
-  searchParams 
-}: { 
-  searchParams?: BusinessesSearchParams;
-}) {
+export default async function BusinessesPage({ searchParams }: PageProps) {
   try {
     // Prepare query constraints
     const queryConstraints: QueryConstraint[] = [];
