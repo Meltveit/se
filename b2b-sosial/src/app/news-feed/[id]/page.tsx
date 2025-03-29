@@ -5,10 +5,10 @@ import PostDetailClient from '@/components/posts/PostDetailClient';
 import { notFound } from 'next/navigation';
 import { Post } from '@/types';
 
-// Type for page props
-type PageProps = {
-  params: { id: string };
-};
+// Interface for page params
+interface PageParams {
+  id: string;
+}
 
 // Generate static params
 export async function generateStaticParams() {
@@ -25,7 +25,11 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: PageParams 
+}): Promise<Metadata> {
   try {
     const postData = await getPost(params.id);
     
@@ -55,7 +59,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // Server component for post detail
-export default async function PostDetailPage({ params }: PageProps) {
+export default async function PostDetailPage({ 
+  params 
+}: { 
+  params: PageParams 
+}) {
   try {
     // Fetch post data
     const postData = await getPost(params.id);

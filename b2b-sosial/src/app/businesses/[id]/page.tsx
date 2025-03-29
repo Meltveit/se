@@ -3,12 +3,16 @@ import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Define the shape of the page's props
-type PageProps = {
-  params: { id: string };
-};
+// Type definition for this page's route params
+interface PageParams {
+  id: string;
+}
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: PageParams 
+}): Promise<Metadata> {
   try {
     const business = await getBusiness(params.id);
     
@@ -37,7 +41,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function BusinessDetailPage({ params }: PageProps) {
+export default async function BusinessDetailPage({ 
+  params 
+}: { 
+  params: PageParams 
+}) {
   try {
     const business = await getBusiness(params.id);
     
