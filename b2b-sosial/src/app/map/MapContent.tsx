@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
+import { where, QueryConstraint } from 'firebase/firestore';
+
 import Select from '@/components/common/Select';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
@@ -14,8 +16,6 @@ import BusinessCard from '@/components/businesses/BusinessCard';
 import { Business } from '@/types';
 import { getBusinesses, getCategories } from '@/lib/firebase/db';
 import { 
-  COUNTRIES, 
-  REGIONS, 
   getCountryOptions, 
   getRegionOptions 
 } from '@/lib/geographic-data';
@@ -25,7 +25,157 @@ const DEFAULT_CENTER = { lat: 59.9139, lng: 10.7522 };
 const DEFAULT_ZOOM = 14; // Slightly closer zoom level for better context
 
 export default function MapContent() {
-  // [Previous code remains the same]
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places']
+  });
+
+  // Initialize state with search params
+  const [categories, setCategories] = useState<{value: string, label: string}[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams?.get('category') || ''
+  );
+  const [selectedCountry, setSelectedCountry] = useState(
+    searchParams?.get('country') || ''
+  );
+  const [selectedRegion, setSelectedRegion] = useState(
+    searchParams?.get('region') || ''
+  );
+  const [availableRegions, setAvailableRegions] = useState<{value: string, label: string}[]>([]);
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams?.get('search') || ''
+  );
+  const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
+  const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
+  const [activeMarker, setActiveMarker] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategories();
+        setCategories([
+          { value: '', label: 'All Categories' },
+          ...categoriesData.map(cat => ({
+            value: cat.id, 
+            label: cat.name
+          }))
+        ]);
+      } catch (_error) {
+        console.error('Error fetching categories');
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch businesses based on filters
+  useEffect(() => {
+    const fetchBusinesses = async () => {
+      try {
+        // Create query constraints with proper Firebase typing
+        const queryConstraints: QueryConstraint[] = [];
+
+        if (selectedCategory) {
+          queryConstraints.push(where('category', '==', selectedCategory));
+        }
+        if (selectedCountry) {
+          queryConstraints.push(where('country', '==', selectedCountry));
+        }
+        if (selectedRegion) {
+          queryConstraints.push(where('region', '==', selectedRegion));
+        }
+
+        const result = await getBusinesses(100, undefined, queryConstraints);
+        const businesses = result.businesses.filter(business => 
+          !searchQuery || 
+          business.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        setFilteredBusinesses(businesses);
+
+        // Update map center if businesses exist
+        if (businesses.length > 0 && businesses[0].location) {
+          setMapCenter({
+            lat: businesses[0].location.latitude,
+            lng: businesses[0].location.longitude
+          });
+        }
+      } catch (_error) {
+        console.error('Error fetching businesses');
+      }
+    };
+
+    fetchBusinesses();
+  }, [selectedCategory, selectedCountry, selectedRegion, searchQuery]);
+
+  // Update available regions when country changes
+  useEffect(() => {
+    const regions = selectedCountry ? getRegionOptions(selectedCountry) : [];
+    setAvailableRegions(regions);
+    setSelectedRegion('');
+  }, [selectedCountry]);
+
+  // Try to get user's location
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(location);
+          setMapCenter(location);
+        },
+        (_error) => {
+          console.error('Error getting location');
+        }
+      );
+    }
+  }, []);
+
+  // Update URL with current filters
+  const updateUrlParams = () => {
+    const params = new URLSearchParams();
+    
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedCountry) params.set('country', selectedCountry);
+    if (selectedRegion) params.set('region', selectedRegion);
+    if (searchQuery) params.set('search', searchQuery);
+
+    router.push(`/map?${params.toString()}`, { scroll: false });
+  };
+
+  // Map interaction handlers
+  const handleMarkerClick = (businessId: string) => {
+    setActiveMarker(businessId);
+  };
+
+  const handleInfoWindowClose = () => {
+    setActiveMarker(null);
+  };
+
+  const centerOnUserLocation = () => {
+    if (userLocation) {
+      setMapCenter(userLocation);
+    }
+  };
+
+  // Filter reset and apply functions
+  const resetFilters = () => {
+    setSelectedCategory('');
+    setSelectedCountry('');
+    setSelectedRegion('');
+    setSearchQuery('');
+    router.push('/map', { scroll: false });
+  };
+
+  const applyFilters = () => {
+    updateUrlParams();
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,7 +251,6 @@ export default function MapContent() {
                 mapContainerStyle={{ width: '100%', height: '100%' }}
                 center={mapCenter}
                 zoom={DEFAULT_ZOOM}
-                onLoad={onMapLoad}
                 options={{
                   streetViewControl: false,
                   mapTypeControl: false,
@@ -192,7 +341,16 @@ export default function MapContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 <h3 className="mt-4 text-lg font-medium text-gray-900">No Businesses Found</h3>
-                <p className="mt-2 text-sm text-gray-500">Try adjusting your filters or search query</p>
+                <p className="mt-2 text-sm text-gray-500">
+                  {(selectedCategory || selectedCountry || selectedRegion || searchQuery)
+                    ? "No businesses match your current filters." 
+                    : "There are no businesses in the directory at the moment."}
+                </p>
+                <div className="mt-6">
+                  <Button variant="outline" onClick={resetFilters}>
+                    Reset Filters
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">

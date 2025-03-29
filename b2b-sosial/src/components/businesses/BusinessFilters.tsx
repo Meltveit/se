@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Category, Tag, Country, Region } from '@/types';
 import Card from '@/components/common/Card';
