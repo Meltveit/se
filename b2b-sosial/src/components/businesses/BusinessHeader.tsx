@@ -1,3 +1,6 @@
+// src/components/businesses/BusinessHeader.tsx
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import { Business } from '@/types';
@@ -22,13 +25,6 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
 
   // Generate a placeholder initial for businesses without logos
   const initial = business.name.charAt(0).toUpperCase();
-
-  // Handle follow/unfollow action
-  const handleFollowClick = () => {
-    if (onFollow) {
-      onFollow(business.id);
-    }
-  };
 
   return (
     <div className="relative mb-8">
@@ -132,7 +128,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({
               <Button
                 type="button"
                 variant={isFollowing ? 'outline' : 'primary'}
-                onClick={handleFollowClick}
+                onClick={() => onFollow && onFollow(business.id)}
                 isLoading={isLoading}
               >
                 {isFollowing ? 'Following' : 'Follow'}

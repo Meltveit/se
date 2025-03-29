@@ -1,10 +1,17 @@
 // src/app/news-feed/[id]/page.tsx
-import React from 'react';
-import { getPost, getBusiness, getPosts } from '@/lib/firebase/db';
+import { Metadata, ResolvingMetadata } from 'next';
+import { getPost, getBusiness } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
 import PostDetailClient from '@/components/posts/PostDetailClient';
+import { notFound } from 'next/navigation';
 
-// This function can be exported from a Server Component
+// Type for page props
+type PageProps = {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+// Generate static params
 export async function generateStaticParams() {
   try {
     const postsData = await getPosts(100); // Get up to 100 posts
@@ -18,38 +25,57 @@ export async function generateStaticParams() {
   }
 }
 
-// This is a Server Component that fetches data and passes it to the Client Component
-export default async function PostDetailPage({ params }: { params: { id: string } }) {
-  const postId = params.id;
-  
+// Generate metadata
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   try {
-    // Fetch post data on the server
-    const postData = await getPost(postId);
+    const postData = await getPost(params.id);
     
     if (!postData) {
-      return (
-        <MainLayout>
-          <div className="container mx-auto px-4 py-8">
-            <div className="text-center py-8">
-              <h2 className="text-xl font-bold text-red-600 mb-4">
-                Post not found
-              </h2>
-              <p className="text-gray-500 mb-6">
-                The post you are looking for might have been removed or is temporarily unavailable.
-              </p>
-            </div>
-          </div>
-        </MainLayout>
-      );
+      return {
+        title: 'Post Not Found',
+        description: 'The requested post could not be found.'
+      };
     }
     
-    // Fetch business data on the server
-    const businessData = postData ? await getBusiness(postData.businessId) : null;
+    return {
+      title: postData.title,
+      description: postData.summary || postData.content.substring(0, 160),
+      openGraph: {
+        title: postData.title,
+        description: postData.summary || postData.content.substring(0, 160),
+        images: postData.coverImage ? [{ url: postData.coverImage }] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Error Loading Post',
+      description: 'An error occurred while loading the post.'
+    };
+  }
+}
+
+// Server component for post detail
+export default async function PostDetailPage({ params }: PageProps) {
+  try {
+    // Fetch post data
+    const postData = await getPost(params.id);
     
-    // Pass the data to the Client Component
+    if (!postData) {
+      notFound();
+    }
+    
+    // Fetch associated business data
+    const businessData = await getBusiness(postData.businessId);
+    
     return (
       <MainLayout>
-        <PostDetailClient initialPost={postData} initialBusiness={businessData} />
+        <PostDetailClient 
+          initialPost={postData} 
+          initialBusiness={businessData} 
+        />
       </MainLayout>
     );
   } catch (error) {
