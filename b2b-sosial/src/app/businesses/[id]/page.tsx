@@ -1,18 +1,16 @@
+// src/app/businesses/[id]/page.tsx
 import { Metadata } from 'next';
 import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Type definition for this page's route params
-interface PageParams {
-  id: string;
-}
+// For generateMetadata
+type GenerateMetadataProps = {
+  params: { id: string }
+};
 
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: PageParams 
-}): Promise<Metadata> {
+// For the component
+export async function generateMetadata({ params }: GenerateMetadataProps): Promise<Metadata> {
   try {
     const business = await getBusiness(params.id);
     
@@ -41,10 +39,11 @@ export async function generateMetadata({
   }
 }
 
-export default async function BusinessDetailPage({ 
-  params 
-}: { 
-  params: PageParams 
+// Define page parameters as props directly on the function
+export default async function BusinessDetailPage({
+  params
+}: {
+  params: { id: string }
 }) {
   try {
     const business = await getBusiness(params.id);

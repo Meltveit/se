@@ -1,14 +1,10 @@
+// src/app/news-feed/[id]/page.tsx
 import { Metadata } from 'next';
 import { getPost, getBusiness, getPosts } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
 import PostDetailClient from '@/components/posts/PostDetailClient';
 import { notFound } from 'next/navigation';
 import { Post } from '@/types';
-
-// Interface for page params
-interface PageParams {
-  id: string;
-}
 
 // Generate static params
 export async function generateStaticParams() {
@@ -24,11 +20,11 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate metadata
+// Generate metadata with direct params typing
 export async function generateMetadata({ 
   params 
 }: { 
-  params: PageParams 
+  params: { id: string } 
 }): Promise<Metadata> {
   try {
     const postData = await getPost(params.id);
@@ -58,11 +54,11 @@ export async function generateMetadata({
   }
 }
 
-// Server component for post detail
+// Server component for post detail with direct params typing
 export default async function PostDetailPage({ 
-  params 
+  params
 }: { 
-  params: PageParams 
+  params: { id: string } 
 }) {
   try {
     // Fetch post data

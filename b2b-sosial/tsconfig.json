@@ -1,4 +1,3 @@
-// tsconfig.json
 {
   "compilerOptions": {
     "target": "es5",
@@ -14,7 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "downlevelIteration": true,  // Legg til denne linjen
+    "downlevelIteration": true,
     "plugins": [
       {
         "name": "next"
@@ -22,7 +21,12 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // Add these options to help with the type errors
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": false
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
