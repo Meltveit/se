@@ -1,12 +1,6 @@
 // src/types/next.d.ts
-import { ReactNode } from 'react';
+// This file extends Next.js types but we don't need to define PageProps here anymore
+// since we're using inline type definitions in the page components
 
-declare module 'next' {
-  export interface PageProps {
-    params: any;  // Changed to 'any' to be more flexible
-    searchParams?: any;
-    children?: ReactNode;
-  }
-}
-
-export {};
+// Leave this empty but keep the file for potential future type extensions
+export {}

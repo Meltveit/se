@@ -10,26 +10,14 @@ import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 import { COUNTRIES } from '@/lib/geographic-data';
 import { Country } from '@/types';
 
-// Define the search params type
-interface BusinessesSearchParams {
+// Define search params type
+type SearchParams = {
   category?: string;
   tag?: string;
   country?: string;
 }
 
-// Use the Next.js PageProps interface
-export interface PageProps {
-  params?: any;
-  searchParams?: BusinessesSearchParams;
-}
-
-// Mock data for regions 
-const regions = [
-  { code: 'oslo', name: 'Oslo', countryCode: 'no' },
-  { code: 'stockholm', name: 'Stockholm', countryCode: 'se' },
-  // Add other regions
-];
-
+// Generate metadata
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Business Directory | B2B Social',
@@ -41,8 +29,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Fix the page props to match what Next.js expects
-export default async function BusinessesPage({ searchParams }: PageProps) {
+// Define with inline types for params and searchParams
+export default async function BusinessesPage({
+  searchParams
+}: {
+  searchParams?: SearchParams;
+}) {
   try {
     // Prepare query constraints
     const queryConstraints: QueryConstraint[] = [];
@@ -66,7 +58,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
       getBusinesses(12, undefined, queryConstraints)
     ]);
 
-    // Convert COUNTRIES to the correct Country[] type if needed
+    // Convert COUNTRIES to the correct Country[] type
     const typedCountries: Country[] = COUNTRIES.map(country => ({
       code: country.value,
       name: country.label,
@@ -91,7 +83,10 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
                 categories={categoriesData}
                 tags={tagsData}
                 countries={typedCountries}
-                regions={regions}
+                regions={[
+                  { code: 'oslo', name: 'Oslo', countryCode: 'no' },
+                  { code: 'stockholm', name: 'Stockholm', countryCode: 'se' },
+                ]}
                 selectedCategory={searchParams?.category}
                 selectedTags={searchParams?.tag ? [searchParams.tag] : []}
                 selectedCountry={searchParams?.country}
