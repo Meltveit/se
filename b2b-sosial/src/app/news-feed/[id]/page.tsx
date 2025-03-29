@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getPost, getBusiness } from '@/lib/firebase/db';
+import { getPost, getBusiness, getPosts } from '@/lib/firebase/db';
 import { Post, Business } from '@/types';
 import MainLayout from '@/components/layout/MainLayout';
 import Card from '@/components/common/Card';
@@ -12,6 +12,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
+
+// Add this function to generate static parameters
+export async function generateStaticParams() {
+  // Fetch all posts IDs to pre-render
+  try {
+    const postsData = await getPosts(100); // Get up to 100 posts
+    
+    // Return an array of objects with id params
+    return postsData.posts.map((post) => ({
+      id: post.id,
+    }));
+  } catch (error) {
+    // If fetching fails, return an empty array
+    console.error('Error fetching posts for static generation:', error);
+    return [];
+  }
+}
 
 export default function PostDetailPage() {
   const params = useParams();
