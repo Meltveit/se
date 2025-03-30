@@ -3,10 +3,10 @@ import { Metadata } from 'next';
 
 /**
  * Interface for Next.js page components props
- * Dette følger den forventede strukturen i Next.js App Router
+ * Following the expected structure in Next.js App Router
  */
 export interface PageProps {
-  params: any;
+  params: { [key: string]: string };
   searchParams?: Record<string, string | string[] | undefined>;
 }
 

@@ -4,16 +4,16 @@ import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Definer en enkel type for params (ikke en Promise)
+// Define params type that matches Next.js App Router expectations
 type Params = {
   id: string;
 }
 
-// Korrekt inline typing for generateMetadata
+// Inline typing for generateMetadata
 export async function generateMetadata({
   params
 }: {
-  params: Params;
+  params: { id: string };
 }): Promise<Metadata> {
   try {
     const business = await getBusiness(params.id);
@@ -43,11 +43,11 @@ export async function generateMetadata({
   }
 }
 
-// Korrekt inline typing for page component
+// Inline typing for page component
 export default async function BusinessDetailPage({
   params
 }: {
-  params: Params;
+  params: { id: string };
 }) {
   try {
     const business = await getBusiness(params.id);

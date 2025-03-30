@@ -6,8 +6,8 @@ import PostDetailClient from '@/components/posts/PostDetailClient';
 import { notFound } from 'next/navigation';
 import { Post } from '@/types';
 
-// Define params type
-type Params = {
+// Define params type for internal use
+interface PostParams {
   id: string;
 }
 
@@ -29,7 +29,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params
 }: {
-  params: Params;
+  params: { id: string };
 }): Promise<Metadata> {
   try {
     const postData = await getPost(params.id);
@@ -63,7 +63,7 @@ export async function generateMetadata({
 export default async function PostDetailPage({
   params
 }: {
-  params: Params;
+  params: { id: string };
 }) {
   try {
     // Fetch post data
