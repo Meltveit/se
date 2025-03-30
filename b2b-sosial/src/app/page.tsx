@@ -1,3 +1,4 @@
+// src/app/page.tsx
 import React from 'react';
 import Link from 'next/link';
 import { getFeaturedBusinesses, getCategories, getPosts } from '@/lib/firebase/db';
@@ -7,8 +8,10 @@ import BusinessCard from '@/components/businesses/BusinessCard';
 import PostCard from '@/components/posts/PostCard';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 
-// Make sure to set the appropriate export directives for Next.js
-export const dynamic = 'force-dynamic';
+// Generate static params for the homepage
+export async function generateStaticParams() {
+  return [{}]; // Empty params for the home page
+}
 
 // Define the page component with no props
 export default async function HomePage() {
@@ -41,7 +44,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Rest of your component... */}
       {/* Featured Businesses Section */}
       <div className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
