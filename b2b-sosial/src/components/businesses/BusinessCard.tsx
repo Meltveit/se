@@ -52,8 +52,12 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
           )}
           
           <div className="ml-3 min-w-0 flex-1">
-            <Link href={`/businesses/${business.id}`}>
-            <h3 className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate max-w-full">
+            <Link 
+              href={`/businesses/${business.id}/index.html`} 
+              passHref
+              prefetch={false}
+            >
+              <h3 className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate max-w-full">
                 {business.name}
               </h3>
             </Link>
