@@ -1,19 +1,3 @@
-// src/app/messages/[conversationId]/page.tsx
-
-// Add this function to generate static parameters for build
-export async function generateStaticParams() {
-  // Return an empty array since these pages will be generated dynamically
-  // This allows Next.js to build the site with "output: export" config
-  return [];
-}
-
-// This server component handles the page loading and client component rendering
-export default function ConversationPageWrapper() {
-  return <ConversationPage />;
-}
-
-// Move the client component to a separate file
-// src/app/messages/[conversationId]/ConversationPage.tsx
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -43,7 +27,7 @@ interface ConversationMessage {
   createdAt: any;
 }
 
-function ConversationPage() {
+export default function ConversationPage() {
   const { conversationId } = useParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -272,5 +256,3 @@ function ConversationPage() {
     </AuthGuard>
   );
 }
-
-export { ConversationPage };
