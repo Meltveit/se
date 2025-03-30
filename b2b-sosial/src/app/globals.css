@@ -238,3 +238,81 @@ select:focus {
   background-color: #eff6ff;
   border-left: 4px solid var(--primary-color);
 }
+
+/* ======= ADDED CSS FOR BETTER VISIBILITY ======= */
+
+/* Fix for select and option elements to ensure text visibility */
+select {
+  background-color: white;
+  color: #111827 !important; /* text-gray-900 - forceful override */
+}
+
+select option {
+  background-color: white;
+  color: #111827 !important; /* Always visible text */
+  padding: 8px;
+}
+
+/* Ensure BusinessCard text is visible */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6,
+.card .card-title, .card .card-header {
+  color: #111827 !important; /* text-gray-900 */
+}
+
+/* Ensure link text in cards is visible */
+.card a, .card button {
+  color: #2563eb; /* Blue-600 */
+}
+
+/* Fix for dropdown items */
+.dropdown-item, 
+.select-option, 
+li.option, 
+.dropdown-menu li, 
+.select-dropdown li {
+  color: #111827 !important; /* text-gray-900 */
+  background-color: white;
+}
+
+/* Fix for tags and badges to ensure they're visible */
+.tag, .badge, [class*="tag-"], [class*="badge-"] {
+  color: #111827 !important; /* Ensure text is dark */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  border: 1px solid #e5e7eb; /* Additional border */
+}
+
+/* Fix for text in white backgrounds to ensure visibility */
+.bg-white *, .bg-gray-50 *, .bg-gray-100 * {
+  color: #111827; /* text-gray-900 */
+}
+
+/* Override any text-white class when in light background contexts */
+.bg-white .text-white, 
+.bg-gray-50 .text-white, 
+.bg-gray-100 .text-white {
+  color: #111827 !important; /* Force dark text */
+}
+
+/* Ensure business card name is visible */
+.business-card-name,
+.business-name,
+.card-title {
+  color: #111827 !important; /* dark text */
+}
+
+/* Make sure form inputs have visible text */
+input, textarea, select {
+  color: #111827 !important; /* text-gray-900 */
+}
+
+/* Ensure that text inside buttons is visible */
+button, .btn {
+  color: inherit !important; /* Respect button's intended color */
+}
+
+/* Fix for dark text on dark backgrounds */
+.bg-blue-600 *, .bg-blue-700 *,
+.bg-gray-800 *, .bg-gray-900 *,
+.bg-black * {
+  color: white !important; /* Ensure text on dark backgrounds is white */
+}

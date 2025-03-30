@@ -1,4 +1,3 @@
-// src/components/common/Select.tsx
 import React, { SelectHTMLAttributes, forwardRef } from 'react';
 
 interface Option {
@@ -42,6 +41,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       lg: 'py-3 text-base',
     };
     
+    // Stil for option elementer for å sikre synlighet
+    const optionClass = "text-gray-900 bg-white";
+    
     return (
       <div className={`${widthStyle} ${className}`}>
         {label && (
@@ -58,13 +60,19 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             id={selectId}
-            className={`${baseSelectStyles} ${widthStyle} ${errorStyle} ${sizeStyles[size]} ${iconStyle} text-gray-900`}
+            className={`${baseSelectStyles} ${widthStyle} ${errorStyle} ${sizeStyles[size]} ${iconStyle} text-gray-900 bg-white`}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? `${selectId}-error` : hint ? `${selectId}-hint` : undefined}
+            style={{ color: '#111827' }} // Explicit color to ensure visibility
             {...rest}
           >
             {options.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option 
+                key={option.value} 
+                value={option.value} 
+                className={optionClass}
+                style={{ color: '#111827', backgroundColor: 'white' }} // Explicit styles for consistent rendering
+              >
                 {option.label}
               </option>
             ))}
