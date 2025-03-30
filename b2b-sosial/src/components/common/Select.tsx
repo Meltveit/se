@@ -41,7 +41,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       lg: 'py-3 text-base',
     };
     
-    // Stil for option elementer for å sikre synlighet
+    // Style for option elements to ensure visibility
     const optionClass = "text-gray-900 bg-white";
     
     return (
@@ -63,9 +63,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={`${baseSelectStyles} ${widthStyle} ${errorStyle} ${sizeStyles[size]} ${iconStyle} text-gray-900 bg-white`}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? `${selectId}-error` : hint ? `${selectId}-hint` : undefined}
-            style={{ color: '#111827' }} // Explicit color to ensure visibility
+            style={{ color: '#111827', backgroundColor: 'white' }} // Explicit color to ensure visibility
             {...rest}
           >
+            <option value="" className={optionClass} style={{ color: '#111827', backgroundColor: 'white' }}>
+              Select an option
+            </option>
             {options.map((option) => (
               <option 
                 key={option.value} 

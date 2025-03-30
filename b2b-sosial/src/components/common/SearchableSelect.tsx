@@ -34,11 +34,26 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   // Filter options based on search query
   useEffect(() => {
+    // Always show all options if search query is empty
+    if (!searchQuery.trim()) {
+      const available = options.filter(option => 
+        !selectedValues.includes(option.value)
+      );
+      setFilteredOptions(available);
+      return;
+    }
+    
+    // Otherwise filter by search term
     const filtered = options.filter(option => 
       option.label.toLowerCase().includes(searchQuery.toLowerCase()) &&
       !selectedValues.includes(option.value)
     );
     setFilteredOptions(filtered);
+    
+    // If we have results, make sure the dropdown is open
+    if (filtered.length > 0) {
+      setIsOpen(true);
+    }
   }, [searchQuery, options, selectedValues]);
 
   // Close dropdown when clicking outside
@@ -63,6 +78,15 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       onChange([...selectedValues, value]);
     }
     setSearchQuery('');
+    
+    // Keep dropdown open after selection to allow for multiple selections
+    // but focus back on the input
+    setTimeout(() => {
+      const input = containerRef.current?.querySelector('input');
+      if (input) {
+        input.focus();
+      }
+    }, 10);
   };
 
   // Remove a selected option
@@ -118,49 +142,63 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       <div className="relative">
         <input
           type="text"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
           placeholder={selectedValues.length < maxSelections ? placeholder : `Maximum ${maxSelections} selections`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
+          onClick={() => setIsOpen(true)}
           disabled={selectedValues.length >= maxSelections}
+          style={{ color: '#1f2937' }} /* Ensure text is visible */
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-          <svg
-            className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
+          <button 
+            type="button"
+            className="focus:outline-none"
             onClick={() => setIsOpen(!isOpen)}
           >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
+            <svg
+              className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Dropdown Options */}
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
+        <div className="absolute z-50 mt-1 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
           <div className="py-1">
             {filteredOptions.length > 0 ? (
               filteredOptions.map(option => (
                 <div
                   key={option.value}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800"
                   onClick={() => handleSelectOption(option.value)}
                 >
                   {option.label}
                 </div>
               ))
             ) : (
-              <div className="px-4 py-2 text-gray-500">No options found</div>
+              <div className="px-4 py-2 text-gray-500">
+                {searchQuery.trim() ? 'No matching tags found' : 'Start typing to search for tags'}
+              </div>
             )}
           </div>
+          {filteredOptions.length > 0 && filteredOptions.length < options.length && (
+            <div className="px-4 py-2 text-xs text-gray-500 border-t border-gray-100">
+              {filteredOptions.length} of {options.length} tags match your search
+            </div>
+          )}
         </div>
       )}
 
