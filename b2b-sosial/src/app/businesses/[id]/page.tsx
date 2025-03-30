@@ -3,16 +3,16 @@ import { Metadata } from 'next';
 import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
-import { PageProps, MetadataProps } from '@/types/pageProps'; // Importerer typene
-
-// Lokal definisjon av SearchParams-typen er ikke lenger nødvendig
 
 // Define the metadata generator function
-export async function generateMetadata({ params, searchParams }: MetadataProps): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   try {
     const resolvedParams = await params;
-    const category = searchParams?.category;
-
+    
     const business = await getBusiness(resolvedParams.id);
 
     if (!business) {
@@ -41,7 +41,11 @@ export async function generateMetadata({ params, searchParams }: MetadataProps):
 }
 
 // Define the page component function
-export default async function BusinessDetailPage({ params, searchParams }: PageProps) {
+export default async function BusinessDetailPage({ 
+  params 
+}: {
+  params: Promise<{ id: string }>;
+}) {
   try {
     const resolvedParams = await params;
 

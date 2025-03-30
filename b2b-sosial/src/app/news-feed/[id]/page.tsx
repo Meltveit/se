@@ -20,14 +20,15 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate metadata with inline param typing
+// Generate metadata with Promise-based param typing
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   try {
-    const postData = await getPost(params.id);
+    const resolvedParams = await params;
+    const postData = await getPost(resolvedParams.id);
     
     if (!postData) {
       return {
@@ -54,15 +55,16 @@ export async function generateMetadata({
   }
 }
 
-// Server component with inline param typing
+// Server component with Promise-based param typing
 export default async function PostDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   try {
+    const resolvedParams = await params;
     // Fetch post data
-    const postData = await getPost(params.id);
+    const postData = await getPost(resolvedParams.id);
     
     if (!postData) {
       notFound();

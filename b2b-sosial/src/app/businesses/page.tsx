@@ -9,9 +9,10 @@ import Button from '@/components/common/Button';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
 import { COUNTRIES } from '@/lib/geographic-data';
 import { Country } from '@/types';
+import { PageProps } from '@/types/pageProps';
 
 // Define search params type
-type SearchParams = {
+type SearchParamsType = {
   category?: string;
   tag?: string;
   country?: string;
@@ -30,13 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Define with inline types for params and searchParams
+// Define with inline types for params and searchParams that align with Next.js expectations
 export default async function BusinessesPage({
-  searchParams
-}: {
-  searchParams?: SearchParams;
-}) {
+  searchParams: searchParamsPromise
+}: PageProps) {
   try {
+    // Resolve the searchParams Promise
+    const searchParams = searchParamsPromise ? await searchParamsPromise as unknown as SearchParamsType : {};
+    
     // Prepare query constraints
     const queryConstraints: QueryConstraint[] = [];
     

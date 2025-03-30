@@ -55,7 +55,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         modules={modules}
         formats={formats}
       />
-      {/* @ts-expect-error - styled-jsx props not recognized by TypeScript */}
+      {/* Remove the ts-expect-error comment and just use the style jsx */}
       <style jsx global>{`
         .quill {
           border-radius: 0.375rem;
