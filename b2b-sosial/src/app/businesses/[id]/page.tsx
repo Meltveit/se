@@ -28,7 +28,11 @@ export async function generateMetadata({
     return {
       title: `${business.name} | B2B Social`,
       description: business.shortDescription || business.description || 'View business profile and details.',
-      // resten av metadataen...
+      openGraph: {
+        title: business.name,
+        description: business.shortDescription || business.description || 'Business profile on B2B Social',
+        images: business.logoUrl ? [{ url: business.logoUrl }] : [],
+      },
     };
   } catch (error) {
     console.error('Error generating metadata:', error);

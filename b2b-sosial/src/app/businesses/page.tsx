@@ -15,6 +15,7 @@ type SearchParams = {
   category?: string;
   tag?: string;
   country?: string;
+  region?: string;
 }
 
 // Generate metadata
@@ -90,7 +91,7 @@ export default async function BusinessesPage({
                 selectedCategory={searchParams?.category}
                 selectedTags={searchParams?.tag ? [searchParams.tag] : []}
                 selectedCountry={searchParams?.country}
-                selectedRegion={undefined}
+                selectedRegion={searchParams?.region}
                 onFilterChange={() => {}}
               />
               
