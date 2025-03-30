@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+b2bsocial-firebase-adminsdk-fbsvc-803b32a071.json
+b2b-sosial/src/lib/firebase/b2bsocial-firebase-adminsdk-fbsvc-803b32a071.json
