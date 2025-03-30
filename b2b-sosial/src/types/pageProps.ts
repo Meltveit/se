@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 
 /**
  * Interface for Next.js page components props
- * This follows the expected structure in Next.js App Router
+ * Dette følger den forventede strukturen i Next.js App Router
  */
 export interface PageProps {
   params: any;

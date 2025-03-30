@@ -4,12 +4,12 @@ import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Define params type that matches Next.js expectations
+// Definer en enkel type for params (ikke en Promise)
 type Params = {
   id: string;
 }
 
-// For generateMetadata - match exactly what Next.js expects
+// Korrekt inline typing for generateMetadata
 export async function generateMetadata({
   params
 }: {
@@ -28,11 +28,7 @@ export async function generateMetadata({
     return {
       title: `${business.name} | B2B Social`,
       description: business.shortDescription || business.description || 'View business profile and details.',
-      openGraph: {
-        title: business.name,
-        description: business.shortDescription || business.description || 'Business profile on B2B Social',
-        images: business.logoUrl ? [{ url: business.logoUrl }] : [],
-      },
+      // resten av metadataen...
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
@@ -43,7 +39,7 @@ export async function generateMetadata({
   }
 }
 
-// Define the component with params type inline - this is the key fix
+// Korrekt inline typing for page component
 export default async function BusinessDetailPage({
   params
 }: {
