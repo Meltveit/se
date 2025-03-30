@@ -7,14 +7,39 @@ import BusinessDetails from '@/components/businesses/BusinessDetails';
 import BusinessContact from '@/components/businesses/BusinessContact';
 import BusinessGallery from '@/components/businesses/BusinessGallery';
 import BusinessPostsList from '@/components/businesses/BusinessPostsList';
+import { useRouter } from 'next/navigation';
+import Button from '@/components/common/Button';
 
 interface BusinessDetailClientProps {
-  initialBusiness: Business;
+  initialBusiness: Business | null;
 }
 
 export default function BusinessDetailClient({ 
   initialBusiness 
 }: BusinessDetailClientProps) {
+  const router = useRouter();
+
+  // Handle the case when initialBusiness is null
+  if (!initialBusiness) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Business Not Found
+            </h2>
+            <p className="text-gray-500 mb-6">
+              The business you are looking for does not exist or has been removed.
+            </p>
+            <Button onClick={() => router.push('/businesses')}>
+              Browse Businesses
+            </Button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <BusinessHeader business={initialBusiness} />
