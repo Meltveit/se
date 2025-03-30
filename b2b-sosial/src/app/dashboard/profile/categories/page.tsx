@@ -1,4 +1,4 @@
-// src/app/dashboard/profile/categories/page.tsx
+// Updated version of src/app/dashboard/profile/categories/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import Card from '@/components/common/Card';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ProfileCompletionSteps from '@/components/profile/ProfileCompletionSteps';
 import Select from '@/components/common/Select';
+import SearchableSelect from '@/components/common/SearchableSelect'; // Import our new component
 
 export default function CategoriesAndTagsPage() {
   const { businessId } = useAuth();
@@ -50,7 +51,7 @@ export default function CategoriesAndTagsPage() {
           // Set existing category and tags if available
           if (businessData.category) setSelectedCategory(businessData.category);
           if (businessData.tags && businessData.tags.length > 0) {
-            setSelectedTags(businessData.tags.slice(0, 3));
+            setSelectedTags(businessData.tags);
           }
         } else {
           setError('Business not found. Please contact support.');
@@ -68,19 +69,6 @@ export default function CategoriesAndTagsPage() {
 
     fetchData();
   }, [businessId]);
-
-  // Handle tag selection
-  const handleTagSelect = (tagId: string) => {
-    if (selectedTags.includes(tagId)) {
-      setSelectedTags(selectedTags.filter(id => id !== tagId));
-    } else {
-      if (selectedTags.length < 3) {
-        setSelectedTags([...selectedTags, tagId]);
-      } else {
-        showToast('You can select up to 3 tags', 'error');
-      }
-    }
-  };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,29 +161,16 @@ export default function CategoriesAndTagsPage() {
                 </p>
               </div>
 
-              {/* Tags Selection */}
+              {/* Tags Selection - Using SearchableSelect */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Tags ({selectedTags.length}/3)
-                </label>
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {tags.map(tag => (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => handleTagSelect(tag.id)}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        selectedTags.includes(tag.id)
-                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                      disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.id)}
-                    >
-                      {tag.name}
-                    </button>
-                  ))}
-                </div>
-                
+                <SearchableSelect
+                  label="Business Tags"
+                  options={tags.map(tag => ({ value: tag.id, label: tag.name }))}
+                  selectedValues={selectedTags}
+                  onChange={setSelectedTags}
+                  placeholder="Search for tags..."
+                  maxSelections={3}
+                />
                 <p className="text-sm text-gray-500 mt-2">
                   Select up to 3 tags that best describe your business. These tags help potential partners and clients find you.
                 </p>

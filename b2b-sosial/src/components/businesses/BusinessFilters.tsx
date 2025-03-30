@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Category, Tag, Country, Region } from '@/types';
 import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
+import SearchableSelect from '@/components/common/SearchableSelect'; // Import our new component
 
 interface BusinessFiltersProps {
   categories: Category[];
@@ -33,7 +34,6 @@ const BusinessFilters: React.FC<BusinessFiltersProps> = ({
   selectedRegion,
   onFilterChange,
 }) => {
-  const [showAllTags, setShowAllTags] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     tags: true,
@@ -59,14 +59,10 @@ const BusinessFilters: React.FC<BusinessFiltersProps> = ({
   };
 
   // Handle tag selection
-  const handleTagChange = (tagId: string) => {
-    const newTags = selectedTags.includes(tagId)
-      ? selectedTags.filter((id) => id !== tagId)
-      : [...selectedTags, tagId];
-
+  const handleTagsChange = (tagIds: string[]) => {
     onFilterChange({
       category: selectedCategory,
-      tags: newTags,
+      tags: tagIds,
       country: selectedCountry,
       region: selectedRegion,
     });
@@ -101,9 +97,6 @@ const BusinessFilters: React.FC<BusinessFiltersProps> = ({
       region: undefined,
     });
   };
-
-  // Limit tags display unless "Show More" is clicked
-  const displayedTags = showAllTags ? tags : tags.slice(0, 8);
 
   // Check if the selected country has regions
   const selectedCountryHasRegions =
@@ -178,7 +171,7 @@ const BusinessFilters: React.FC<BusinessFiltersProps> = ({
         )}
       </div>
 
-      {/* Tags Section */}
+      {/* Tags Section - Using SearchableSelect */}
       <div className="mb-4 pt-4 border-t border-gray-200">
         <button
           className="flex justify-between items-center w-full text-left"
@@ -200,29 +193,13 @@ const BusinessFilters: React.FC<BusinessFiltersProps> = ({
         </button>
         {expandedSections.tags && (
           <div className="mt-2">
-            <div className="flex flex-wrap gap-2">
-              {displayedTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    selectedTags.includes(tag.id)
-                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                      : 'bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200'
-                  }`}
-                  onClick={() => handleTagChange(tag.id)}
-                >
-                  {tag.name}
-                </button>
-              ))}
-            </div>
-            {tags.length > 8 && (
-              <button
-                className="mt-2 text-sm text-blue-600 hover:text-blue-500"
-                onClick={() => setShowAllTags(!showAllTags)}
-              >
-                {showAllTags ? 'Show Less' : `Show More (${tags.length - 8} more)`}
-              </button>
-            )}
+            <SearchableSelect
+              options={tags.map(tag => ({ value: tag.id, label: tag.name }))}
+              selectedValues={selectedTags}
+              onChange={handleTagsChange}
+              placeholder="Search tags..."
+              maxSelections={5}
+            />
           </div>
         )}
       </div>
