@@ -6,11 +6,6 @@ import PostDetailClient from '@/components/posts/PostDetailClient';
 import { notFound } from 'next/navigation';
 import { Post } from '@/types';
 
-// Define params type for internal use
-interface PostParams {
-  id: string;
-}
-
 // Generate static params
 export async function generateStaticParams() {
   try {
@@ -27,7 +22,7 @@ export async function generateStaticParams() {
 
 // Generate metadata with inline param typing
 export async function generateMetadata({
-  params
+  params,
 }: {
   params: { id: string };
 }): Promise<Metadata> {
@@ -61,7 +56,7 @@ export async function generateMetadata({
 
 // Server component with inline param typing
 export default async function PostDetailPage({
-  params
+  params,
 }: {
   params: { id: string };
 }) {

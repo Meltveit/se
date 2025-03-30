@@ -1,20 +1,19 @@
-// src/types/pageProps.ts
 import { Metadata } from 'next';
 
 /**
- * Interface for Next.js page components props
- * Following the expected structure in Next.js App Router
+ * Interface for Next.js page components props with Promise<params>
+ * This follows the expected structure in Next.js 15+ App Router
  */
 export interface PageProps {
-  params: { [key: string]: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ [key: string]: string }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 /**
- * Interface for metadata generation functions
+ * Interface for metadata generation functions with Promise<params>
  */
 export interface MetadataProps {
-  params: { [key: string]: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ [key: string]: string }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
   parent?: Promise<Metadata>;
 }

@@ -3,28 +3,25 @@ import { Metadata } from 'next';
 import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
+import { PageProps, MetadataProps } from '@/types/pageProps'; // Importerer typene
 
-// Define params type that matches Next.js App Router expectations
-type Params = {
-  id: string;
-}
+// Lokal definisjon av SearchParams-typen er ikke lenger nødvendig
 
-// Inline typing for generateMetadata
-export async function generateMetadata({
-  params
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+// Define the metadata generator function
+export async function generateMetadata({ params, searchParams }: MetadataProps): Promise<Metadata> {
   try {
-    const business = await getBusiness(params.id);
-    
+    const resolvedParams = await params;
+    const category = searchParams?.category;
+
+    const business = await getBusiness(resolvedParams.id);
+
     if (!business) {
       return {
         title: 'Business Not Found | B2B Social',
         description: 'The requested business could not be found.'
       };
     }
-    
+
     return {
       title: `${business.name} | B2B Social`,
       description: business.shortDescription || business.description || 'View business profile and details.',
@@ -43,22 +40,20 @@ export async function generateMetadata({
   }
 }
 
-// Inline typing for page component
-export default async function BusinessDetailPage({
-  params
-}: {
-  params: { id: string };
-}) {
+// Define the page component function
+export default async function BusinessDetailPage({ params, searchParams }: PageProps) {
   try {
-    const business = await getBusiness(params.id);
-    
+    const resolvedParams = await params;
+
+    const business = await getBusiness(resolvedParams.id);
+
     if (!business) {
       notFound();
     }
-    
+
     return <BusinessDetailClient initialBusiness={business} />;
   } catch (error) {
     console.error('Error loading business:', error);
-    throw error; // This will be caught by the closest error boundary
+    throw error;
   }
 }
