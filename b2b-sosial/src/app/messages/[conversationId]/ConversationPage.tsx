@@ -1,3 +1,4 @@
+// src/app/messages/[conversationId]/ConversationPage.tsx
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -27,7 +28,7 @@ interface ConversationMessage {
   createdAt: any;
 }
 
-export default function ConversationPage() {
+export function ConversationPage() {
   const { conversationId } = useParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -40,6 +41,7 @@ export default function ConversationPage() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // Rest of your component code...
   // Fetch conversation and messages
   useEffect(() => {
     const fetchConversationData = async () => {
