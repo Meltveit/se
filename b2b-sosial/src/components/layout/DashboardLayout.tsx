@@ -27,32 +27,27 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
           <div className="w-full md:w-64 shrink-0">
             <div className="bg-white rounded-lg shadow-sm p-4 sticky top-4">
               <div className="space-y-1">
-                <Link 
-                  href="/dashboard" 
+                <Link href="/dashboard/index.html" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Dashboard
                 </Link>
-                <Link 
-                  href="/dashboard/profile" 
+                <Link href="/dashboard/profile/index.html" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Business Profile
                 </Link>
-                <Link 
-                  href="/dashboard/posts" 
+                <Link href="/dashboard/posts/index.html" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Posts
                 </Link>
-                <Link 
-                  href="/dashboard/messages" 
+                <Link href="/dashboard/messages/index.html" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Messages
                 </Link>
-                <Link 
-                  href="/dashboard/settings" 
+                <Link href="/dashboard/settings/index.html" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Settings

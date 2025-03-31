@@ -1,11 +1,15 @@
+// src/components/common/Header.tsx - Updated for static export
 "use client";
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/firebase/auth';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/contexts/ToastContext';
+import { toStaticPath } from '@/utils/staticNavigation';
+
+// Import the StaticLink component instead of Next/Link
+import { StaticLink } from '@/components/common/StaticNavigation';
 
 const Header: React.FC = () => {
   const { user, userProfile, isBusinessOwner, businessId, loading } = useAuth();
@@ -18,7 +22,8 @@ const Header: React.FC = () => {
     try {
       await signOut();
       showToast('Successfully logged out', 'success');
-      router.push('/');
+      // Update to include index.html for static routing
+      router.push('/index.html');
     } catch (error) {
       console.error('Error signing out:', error);
       showToast('Failed to log out. Please try again.', 'error');
@@ -31,7 +36,8 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
+            {/* Use StaticLink instead of Link */}
+            <StaticLink href="/" className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 mr-2"
@@ -41,7 +47,7 @@ const Header: React.FC = () => {
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
               </svg>
               <h1 className="text-xl font-bold">B2B Social</h1>
-            </Link>
+            </StaticLink>
           </div>
 
           {/* Desktop Navigation */}
@@ -68,15 +74,16 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            <Link href="/businesses" className="hover:text-blue-100">
+            {/* Updated navigation links */}
+            <StaticLink href="/businesses/index.html" className="hover:text-blue-100">
               Businesses
-            </Link>
-            <Link href="/news-feed" className="hover:text-blue-100">
+            </StaticLink>
+            <StaticLink href="/news-feed/index.html" className="hover:text-blue-100">
               News Feed
-            </Link>
-            <Link href="/map" className="hover:text-blue-100">
+            </StaticLink>
+            <StaticLink href="/map/index.html" className="hover:text-blue-100">
               Map
-            </Link>
+            </StaticLink>
 
             {loading ? (
               <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -95,29 +102,29 @@ const Header: React.FC = () => {
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     {isBusinessOwner && (
-                      <Link
-                        href={`/businesses/${businessId}`}
+                      <StaticLink
+                        href={`/businesses/${businessId}/index.html`}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setProfileMenuOpen(false)}
                       >
                         Business Profile
-                      </Link>
+                      </StaticLink>
                     )}
-                    <Link
-                      href="/profile"
+                    <StaticLink
+                      href="/profile/index.html"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setProfileMenuOpen(false)}
                     >
                       Your Profile
-                    </Link>
+                    </StaticLink>
                     {isBusinessOwner && (
-                      <Link
-                        href="/dashboard"
+                      <StaticLink
+                        href="/dashboard/index.html"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setProfileMenuOpen(false)}
                       >
                         Business Dashboard
-                      </Link>
+                      </StaticLink>
                     )}
                     <button
                       onClick={() => {
@@ -133,18 +140,18 @@ const Header: React.FC = () => {
               </div>
             ) : (
               <div className="space-x-2">
-                <Link
-                  href="/login"
+                <StaticLink
+                  href="/login/index.html"
                   className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium"
                 >
                   Login
-                </Link>
-                <Link
-                  href="/register/business"
+                </StaticLink>
+                <StaticLink
+                  href="/register/business/index.html"
                   className="px-4 py-2 bg-blue-700 text-white rounded-lg font-medium"
                 >
                   Register Business
-                </Link>
+                </StaticLink>
               </div>
             )}
           </div>
@@ -199,43 +206,44 @@ const Header: React.FC = () => {
                 </button>
               </div>
 
-              <Link href="/businesses" className="py-2 hover:text-blue-100">
+              {/* Updated mobile navigation links */}
+              <StaticLink href="/businesses/index.html" className="py-2 hover:text-blue-100">
                 Businesses
-              </Link>
-              <Link href="/news-feed" className="py-2 hover:text-blue-100">
+              </StaticLink>
+              <StaticLink href="/news-feed/index.html" className="py-2 hover:text-blue-100">
                 News Feed
-              </Link>
-              <Link href="/map" className="py-2 hover:text-blue-100">
+              </StaticLink>
+              <StaticLink href="/map/index.html" className="py-2 hover:text-blue-100">
                 Map
-              </Link>
+              </StaticLink>
 
               {user ? (
                 <>
                   {isBusinessOwner && (
                     <>
-                      <Link 
-                        href={`/businesses/${businessId}`} 
+                      <StaticLink 
+                        href={`/businesses/${businessId}/index.html`} 
                         className="py-2 hover:text-blue-100"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Business Profile
-                      </Link>
-                      <Link 
-                        href="/dashboard" 
+                      </StaticLink>
+                      <StaticLink 
+                        href="/dashboard/index.html" 
                         className="py-2 hover:text-blue-100"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Business Dashboard
-                      </Link>
+                      </StaticLink>
                     </>
                   )}
-                  <Link 
-                    href="/profile" 
+                  <StaticLink 
+                    href="/profile/index.html" 
                     className="py-2 hover:text-blue-100"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Your Profile
-                  </Link>
+                  </StaticLink>
                   <button
                     onClick={() => {
                       handleSignOut();
@@ -248,18 +256,18 @@ const Header: React.FC = () => {
                 </>
               ) : (
                 <div className="flex flex-col space-y-2">
-                  <Link
-                    href="/login"
+                  <StaticLink
+                    href="/login/index.html"
                     className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium text-center"
                   >
                     Login
-                  </Link>
-                  <Link
-                    href="/register/business"
+                  </StaticLink>
+                  <StaticLink
+                    href="/register/business/index.html"
                     className="px-4 py-2 bg-blue-700 text-white rounded-lg font-medium text-center"
                   >
                     Register Business
-                  </Link>
+                  </StaticLink>
                 </div>
               )}
             </div>

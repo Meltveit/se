@@ -20,7 +20,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href="/" className="flex justify-center">
+        <Link href="/index.html" className="flex justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-10 w-10 text-blue-600"

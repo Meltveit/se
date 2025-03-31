@@ -33,10 +33,10 @@ export default async function HomePage() {
               B2B Social helps you find, connect, and collaborate with other businesses. Create your business profile, share updates, and grow your network.
             </p>
             <div className="mt-10 flex items-center gap-x-6">
-              <Link href="/register/business">
+              <Link href="/register/business/index.html">
                 <Button size="lg">Register Your Business</Button>
               </Link>
-              <Link href="/businesses" className="text-white font-semibold">
+              <Link href="/businesses/index.html" className="text-white font-semibold">
                 Browse Businesses <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -49,7 +49,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Featured Businesses</h2>
-            <Link href="/businesses" className="text-blue-600 hover:text-blue-500">
+            <Link href="/businesses/index.html" className="text-blue-600 hover:text-blue-500">
               View All
             </Link>
           </div>
@@ -66,7 +66,7 @@ export default async function HomePage() {
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
               <p className="text-gray-500">No featured businesses yet. Be the first!</p>
               <div className="mt-4">
-                <Link href="/register/business">
+                <Link href="/register/business/index.html">
                   <Button>Register Your Business</Button>
                 </Link>
               </div>
@@ -111,7 +111,7 @@ export default async function HomePage() {
 
           {categories.length > 8 && (
             <div className="text-center mt-8">
-              <Link href="/businesses">
+              <Link href="/businesses/index.html">
                 <Button variant="outline">View All Categories</Button>
               </Link>
             </div>
@@ -124,7 +124,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Latest Posts</h2>
-            <Link href="/news-feed" className="text-blue-600 hover:text-blue-500">
+            <Link href="/news-feed/index.html" className="text-blue-600 hover:text-blue-500">
               View All
             </Link>
           </div>
@@ -160,7 +160,7 @@ export default async function HomePage() {
             Join the growing network of businesses on our platform and expand your reach.
           </p>
           <div className="mt-8">
-            <Link href="/register/business">
+            <Link href="/register/business/index.html">
               <Button size="lg" variant="outline" className="bg-white text-blue-600 hover:bg-blue-50">
                 Register Your Business
               </Button>

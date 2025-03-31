@@ -31,7 +31,7 @@ export default function BusinessDetailClient({
             <p className="text-gray-500 mb-6">
               The business you are looking for does not exist or has been removed.
             </p>
-            <Button onClick={() => router.push('/businesses')}>
+            <Button onClick={() => router.push("/businesses/index.html")}>
               Browse Businesses
             </Button>
           </div>

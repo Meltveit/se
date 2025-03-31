@@ -115,7 +115,7 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({ business 
               Your business profile is now complete. You can edit it anytime from the dashboard.
             </p>
             <div className="mt-4">
-              <Link href="/dashboard/profile">
+              <Link href="/dashboard/profile/index.html">
                 <Button variant="outline" fullWidth>
                   Edit Profile
                 </Button>
