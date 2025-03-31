@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { StaticLink } from '@/components/common/StaticNavigation';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -19,24 +19,24 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
             <ul>
               <li className="mb-2">
-                <Link href="/about" className="text-gray-400 hover:text-white">
+                <StaticLink href="/about" className="text-gray-400 hover:text-white">
                   About Us
-                </Link>
+                </StaticLink>
               </li>
               <li className="mb-2">
-                <Link href="/businesses" className="text-gray-400 hover:text-white">
+                <StaticLink href="/businesses" className="text-gray-400 hover:text-white">
                   Find Businesses
-                </Link>
+                </StaticLink>
               </li>
               <li className="mb-2">
-                <Link href="/map" className="text-gray-400 hover:text-white">
+                <StaticLink href="/map" className="text-gray-400 hover:text-white">
                   Business Map
-                </Link>
+                </StaticLink>
               </li>
               <li className="mb-2">
-                <Link href="/login" className="text-gray-400 hover:text-white">
+                <StaticLink href="/login" className="text-gray-400 hover:text-white">
                   Sign In
-                </Link>
+                </StaticLink>
               </li>
             </ul>
           </div>

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/common/Header';
+import { StaticLink } from '@/components/common/StaticNavigation';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -27,36 +27,36 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
           <div className="w-full md:w-64 shrink-0">
             <div className="bg-white rounded-lg shadow-sm p-4 sticky top-4">
               <div className="space-y-1">
-                <Link 
+                <StaticLink 
                   href="/dashboard" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Dashboard
-                </Link>
-                <Link 
+                </StaticLink>
+                <StaticLink 
                   href="/dashboard/profile" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Business Profile
-                </Link>
-                <Link 
+                </StaticLink>
+                <StaticLink 
                   href="/dashboard/posts" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Posts
-                </Link>
-                <Link 
+                </StaticLink>
+                <StaticLink 
                   href="/dashboard/messages" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Messages
-                </Link>
-                <Link 
+                </StaticLink>
+                <StaticLink 
                   href="/dashboard/settings" 
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 text-gray-700"
                 >
                   Settings
-                </Link>
+                </StaticLink>
               </div>
               
               <div className="border-t border-gray-200 mt-4 pt-4">

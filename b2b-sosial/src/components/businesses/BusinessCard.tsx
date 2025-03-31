@@ -1,8 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Business } from '@/types';
 import Button from '@/components/common/Button';
+import { StaticLink } from '@/components/common/StaticNavigation';
 
 interface BusinessCardProps {
   business: Business;
@@ -52,15 +52,13 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
           )}
           
           <div className="ml-3 min-w-0 flex-1">
-            <Link 
-              href={`/businesses/${business.id}/index.html`} 
-              passHref
-              prefetch={false}
+            <StaticLink 
+              href={`/businesses/${business.id}`} 
             >
               <h3 className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate max-w-full">
                 {business.name}
               </h3>
-            </Link>
+            </StaticLink>
             
             {business.tags && business.tags.length > 0 && (
               <div className="flex flex-wrap">

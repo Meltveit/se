@@ -1,37 +1,14 @@
-// Firebase Admin SDK for server-side operations
-import { initializeApp, App } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import * as admin from 'firebase-admin';
-import serviceAccount from './b2bsocial-firebase-adminsdk-fbsvc-803b32a071.json' assert { type: "json" };
+// src/lib/firebase/firebaseAdmin.ts
+// This is a temporary solution to fix the build error
+// In a static export, the Firebase Admin SDK is not usable
 
-let adminApp: App | undefined = undefined;
-
-function initializeAdminApp() {
-  if (!adminApp) {
-    try {
-      // Bruk servicekonto-nøkkelen du importerte
-      adminApp = initializeApp({
-        credential: admin.credential.cert(serviceAccount as any), // Bruk 'as any' for å unngå typeproblemer
-      });
-    } catch (error: any) {
-      console.error('Feil ved initialisering av Firebase Admin:', error);
-    }
-  }
-  return adminApp;
-}
-
+// Mock admin functions for client-side use
 export const adminDb = () => {
-  const app = initializeAdminApp();
-  if (app) {
-    return getFirestore(app);
-  }
-  return null;
-};
-
-export const adminAuth = () => {
-  const app = initializeAdminApp();
-  if (app) {
-    return admin.auth();
-  }
-  return null;
-};
+    console.warn('Firebase Admin SDK is not available in the browser');
+    return null;
+  };
+  
+  export const adminAuth = () => {
+    console.warn('Firebase Admin SDK is not available in the browser');
+    return null;
+  };

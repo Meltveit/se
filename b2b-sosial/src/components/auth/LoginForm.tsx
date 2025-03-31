@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { signIn } from '@/lib/firebase/auth';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
+import { StaticLink, useStaticRouter } from '@/components/common/StaticNavigation';
 
 // Add a props interface
 interface LoginFormProps {
@@ -18,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   
-  const router = useRouter();
+  const router = useStaticRouter();
   const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,9 +71,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/
             Password
           </label>
           <div className="text-sm">
-            <Link href="/forgot-password" className="text-blue-600 hover:text-blue-500">
+            <StaticLink href="/forgot-password" className="text-blue-600 hover:text-blue-500">
               Forgot your password?
-            </Link>
+            </StaticLink>
           </div>
         </div>
         <div className="mt-1">
@@ -115,13 +114,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/
         <div className="text-sm">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/register/user" className="text-blue-600 hover:text-blue-500">
+            <StaticLink href="/register/user" className="text-blue-600 hover:text-blue-500">
               Register as User
-            </Link>{' '}
+            </StaticLink>{' '}
             or{' '}
-            <Link href="/register/business" className="text-blue-600 hover:text-blue-500">
+            <StaticLink href="/register/business" className="text-blue-600 hover:text-blue-500">
               Register as Business
-            </Link>
+            </StaticLink>
           </p>
         </div>
       </div>
