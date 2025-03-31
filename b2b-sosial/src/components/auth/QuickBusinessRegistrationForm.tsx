@@ -200,7 +200,7 @@ const QuickBusinessRegistrationForm: React.FC<QuickBusinessRegistrationFormProps
           <div className="ml-3 text-sm">
             <label htmlFor="acceptTerms" className="font-medium text-gray-700">
               I accept the{' '}
-              <Link href="/terms/index.html" className="text-blue-600 hover:text-blue-500">
+              <Link href="/terms" className="text-blue-600 hover:text-blue-500">
                 Terms and Conditions
               </Link>
             </label>
@@ -251,7 +251,7 @@ const QuickBusinessRegistrationForm: React.FC<QuickBusinessRegistrationFormProps
         <div className="text-sm">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <Link href="/login/index.html" className="text-blue-600 hover:text-blue-500">
+            <Link href="/login" className="text-blue-600 hover:text-blue-500">
               Sign in
             </Link>
           </p>

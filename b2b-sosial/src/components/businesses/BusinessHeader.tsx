@@ -1,3 +1,4 @@
+// src/components/businesses/BusinessHeader.tsx
 'use client';
 
 import React from 'react';

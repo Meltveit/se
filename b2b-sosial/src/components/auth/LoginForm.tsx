@@ -72,7 +72,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/
             Password
           </label>
           <div className="text-sm">
-            <Link href="/forgot-password/index.html" className="text-blue-600 hover:text-blue-500">
+            <Link href="/forgot-password" className="text-blue-600 hover:text-blue-500">
               Forgot your password?
             </Link>
           </div>
@@ -115,11 +115,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ initialEmail = '', returnUrl = '/
         <div className="text-sm">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/register/user/index.html" className="text-blue-600 hover:text-blue-500">
+            <Link href="/register/user" className="text-blue-600 hover:text-blue-500">
               Register as User
             </Link>{' '}
             or{' '}
-            <Link href="/register/business/index.html" className="text-blue-600 hover:text-blue-500">
+            <Link href="/register/business" className="text-blue-600 hover:text-blue-500">
               Register as Business
             </Link>
           </p>

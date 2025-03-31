@@ -5,6 +5,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  trailingSlash: true, // This is important for static exports
   transpilePackages: ['react-quill'],
 };
 

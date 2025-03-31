@@ -1,19 +1,14 @@
-// src/components/common/Header.tsx - Updated for static export
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/firebase/auth';
 import { useToast } from '@/contexts/ToastContext';
-import { toStaticPath } from '@/utils/staticNavigation';
-
-// Import the StaticLink component instead of Next/Link
-import { StaticLink } from '@/components/common/StaticNavigation';
+import { StaticLink, useStaticRouter } from '@/components/common/StaticNavigation';
 
 const Header: React.FC = () => {
   const { user, userProfile, isBusinessOwner, businessId, loading } = useAuth();
-  const router = useRouter();
+  const router = useStaticRouter();
   const { showToast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -22,8 +17,7 @@ const Header: React.FC = () => {
     try {
       await signOut();
       showToast('Successfully logged out', 'success');
-      // Update to include index.html for static routing
-      router.push('/index.html');
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
       showToast('Failed to log out. Please try again.', 'error');
@@ -36,7 +30,6 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center">
-            {/* Use StaticLink instead of Link */}
             <StaticLink href="/" className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,14 +67,13 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Updated navigation links */}
-            <StaticLink href="/businesses/index.html" className="hover:text-blue-100">
+            <StaticLink href="/businesses" className="hover:text-blue-100">
               Businesses
             </StaticLink>
-            <StaticLink href="/news-feed/index.html" className="hover:text-blue-100">
+            <StaticLink href="/news-feed" className="hover:text-blue-100">
               News Feed
             </StaticLink>
-            <StaticLink href="/map/index.html" className="hover:text-blue-100">
+            <StaticLink href="/map" className="hover:text-blue-100">
               Map
             </StaticLink>
 
@@ -103,7 +95,7 @@ const Header: React.FC = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     {isBusinessOwner && (
                       <StaticLink
-                        href={`/businesses/${businessId}/index.html`}
+                        href={`/businesses/${businessId}`}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setProfileMenuOpen(false)}
                       >
@@ -111,7 +103,7 @@ const Header: React.FC = () => {
                       </StaticLink>
                     )}
                     <StaticLink
-                      href="/profile/index.html"
+                      href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setProfileMenuOpen(false)}
                     >
@@ -119,7 +111,7 @@ const Header: React.FC = () => {
                     </StaticLink>
                     {isBusinessOwner && (
                       <StaticLink
-                        href="/dashboard/index.html"
+                        href="/dashboard"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setProfileMenuOpen(false)}
                       >
@@ -141,13 +133,13 @@ const Header: React.FC = () => {
             ) : (
               <div className="space-x-2">
                 <StaticLink
-                  href="/login/index.html"
+                  href="/login"
                   className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium"
                 >
                   Login
                 </StaticLink>
                 <StaticLink
-                  href="/register/business/index.html"
+                  href="/register/business"
                   className="px-4 py-2 bg-blue-700 text-white rounded-lg font-medium"
                 >
                   Register Business
@@ -206,14 +198,13 @@ const Header: React.FC = () => {
                 </button>
               </div>
 
-              {/* Updated mobile navigation links */}
-              <StaticLink href="/businesses/index.html" className="py-2 hover:text-blue-100">
+              <StaticLink href="/businesses" className="py-2 hover:text-blue-100">
                 Businesses
               </StaticLink>
-              <StaticLink href="/news-feed/index.html" className="py-2 hover:text-blue-100">
+              <StaticLink href="/news-feed" className="py-2 hover:text-blue-100">
                 News Feed
               </StaticLink>
-              <StaticLink href="/map/index.html" className="py-2 hover:text-blue-100">
+              <StaticLink href="/map" className="py-2 hover:text-blue-100">
                 Map
               </StaticLink>
 
@@ -222,14 +213,14 @@ const Header: React.FC = () => {
                   {isBusinessOwner && (
                     <>
                       <StaticLink 
-                        href={`/businesses/${businessId}/index.html`} 
+                        href={`/businesses/${businessId}`} 
                         className="py-2 hover:text-blue-100"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Business Profile
                       </StaticLink>
                       <StaticLink 
-                        href="/dashboard/index.html" 
+                        href="/dashboard" 
                         className="py-2 hover:text-blue-100"
                         onClick={() => setMobileMenuOpen(false)}
                       >
@@ -238,7 +229,7 @@ const Header: React.FC = () => {
                     </>
                   )}
                   <StaticLink 
-                    href="/profile/index.html" 
+                    href="/profile" 
                     className="py-2 hover:text-blue-100"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -257,13 +248,13 @@ const Header: React.FC = () => {
               ) : (
                 <div className="flex flex-col space-y-2">
                   <StaticLink
-                    href="/login/index.html"
+                    href="/login"
                     className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium text-center"
                   >
                     Login
                   </StaticLink>
                   <StaticLink
-                    href="/register/business/index.html"
+                    href="/register/business"
                     className="px-4 py-2 bg-blue-700 text-white rounded-lg font-medium text-center"
                   >
                     Register Business

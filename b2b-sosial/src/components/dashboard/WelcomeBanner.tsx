@@ -41,7 +41,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ user, business, isNewUser
           
           <div className="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0 flex space-x-3">
             {showProfileCompletion && (
-              <Link href="/dashboard/profile/index.html">
+              <Link href="/dashboard/profile">
                 <Button variant={profilePercentage < 50 ? 'primary' : 'outline'}>
                   Complete Profile
                 </Button>
@@ -49,7 +49,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ user, business, isNewUser
             )}
             
             {showCreatePost && (
-              <Link href="/dashboard/posts/new/index.html">
+              <Link href="/dashboard/posts/new">
                 <Button variant={profilePercentage >= 50 && profilePercentage < 100 ? 'primary' : 'outline'}>
                   Create Post
                 </Button>
