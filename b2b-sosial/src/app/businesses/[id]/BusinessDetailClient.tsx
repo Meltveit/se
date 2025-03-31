@@ -12,10 +12,12 @@ import Button from '@/components/common/Button';
 
 interface BusinessDetailClientProps {
   initialBusiness: Business | null;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default function BusinessDetailClient({ 
-  initialBusiness 
+export default function BusinessDetailClient({
+  initialBusiness,
+  searchParams,
 }: BusinessDetailClientProps) {
   const router = useRouter();
 
@@ -43,25 +45,25 @@ export default function BusinessDetailClient({
   return (
     <MainLayout>
       <BusinessHeader business={initialBusiness} />
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <BusinessDetails business={initialBusiness} />
-            
+
             {initialBusiness.gallery && initialBusiness.gallery.length > 0 && (
               <BusinessGallery business={initialBusiness} />
             )}
-            
+
             {initialBusiness.profileCompletionStatus.completionPercentage >= 50 && (
               <BusinessPostsList business={initialBusiness} limit={5} showViewAll />
             )}
           </div>
-          
+
           <div>
-            <BusinessContact 
-              business={initialBusiness} 
-              onSendMessage={() => {}} 
+            <BusinessContact
+              business={initialBusiness}
+              onSendMessage={() => {}}
             />
           </div>
         </div>

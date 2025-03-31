@@ -1,83 +1,97 @@
 // src/app/businesses/[id]/page.tsx
 import { Metadata } from 'next';
-import { getBusiness } from '@/lib/firebase/db';
+import { getBusiness, getBusinesses } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
+import { Business } from '@/types'; // Importer Business-typen
 
-// Simple generateStaticParams implementation directly in the page file
-export async function generateStaticParams() {
-  // Return a placeholder - this is the minimal implementation needed
-  return [{ id: 'placeholder' }];
+// Definer PageParams-interfacet helt øverst
+interface PageParams {
+  id: string;
 }
 
-// Define the metadata generator function
-export async function generateMetadata({ 
-  params 
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+// Definer PageProps-interfacet helt øverst
+interface PageProps {
+  params: PageParams; // Bruk PageParams-interfacet
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+// Generer statiske parametere direkte i sidefilen
+export async function generateStaticParams() {
   try {
-    const resolvedParams = await params;
-    
-    // Special handling for placeholder during build
-    if (resolvedParams.id === 'placeholder') {
+    const { businesses } = await getBusinesses(500);
+    return businesses.map((business) => ({
+      id: business.id,
+    }));
+  } catch (error) {
+    console.error('Feil ved generering av statiske parametere for bedrifter:', error);
+    return [{ id: 'placeholder' }];
+  }
+}
+
+// Funksjon for metadatagenerering
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  try {
+    // Håndter plassholder-tilfellet under bygging
+    if (params.id === 'placeholder') {
       return {
-        title: 'Business Profile | B2B Social',
-        description: 'View business details and profile information.',
+        title: 'Bedriftsprofil | B2B Social',
+        description: 'Detaljer om bedriftsprofil'
       };
     }
-    
-    const business = await getBusiness(resolvedParams.id);
+
+    const business = await getBusiness(params.id);
 
     if (!business) {
       return {
-        title: 'Business Not Found | B2B Social',
-        description: 'The requested business could not be found.'
+        title: 'Bedrift Ikke Funnet',
+        description: 'Den forespurte bedriften ble ikke funnet'
       };
     }
 
     return {
       title: `${business.name} | B2B Social`,
-      description: business.shortDescription || business.description || 'View business profile and details.',
+      description: business.shortDescription || 'Detaljer om bedriftsprofil',
       openGraph: {
         title: business.name,
-        description: business.shortDescription || business.description || 'Business profile on B2B Social',
+        description: business.shortDescription || 'Bedriftsprofil',
         images: business.logoUrl ? [{ url: business.logoUrl }] : [],
       },
     };
   } catch (error) {
-    console.error('Error generating metadata:', error);
+    console.error('Feil ved generering av metadata:', error);
     return {
-      title: 'Business Profile | B2B Social',
-      description: 'View business details and profile information.',
+      title: 'Bedriftsprofil',
+      description: 'Detaljer om bedriftsprofil'
     };
   }
 }
 
-// Define the page component function
-export default async function BusinessDetailPage({ 
-  params 
-}: {
-  params: Promise<{ id: string }>;
-}) {
+// Sidekomponent
+const BusinessDetailPage: React.FC<PageProps> = async ({ params, searchParams }) => {
   try {
-    const resolvedParams = await params;
-    
-    // Special handling for placeholder ID during static build
-    if (resolvedParams.id === 'placeholder') {
-      return <BusinessDetailClient initialBusiness={null} />;
+    const { id } = params;
+
+    if (id === 'placeholder') {
+      return <BusinessDetailClient initialBusiness={null} searchParams={searchParams} />;
     }
 
-    const business = await getBusiness(resolvedParams.id);
+    const business = await getBusiness(id);
 
     if (!business) {
       notFound();
     }
 
-    return <BusinessDetailClient initialBusiness={business} />;
+    return <BusinessDetailClient initialBusiness={business} searchParams={searchParams} />;
   } catch (error) {
-    console.error('Error loading business:', error);
-    // Return a fallback UI instead of throwing during build
-    return <BusinessDetailClient initialBusiness={null} />;
+    console.error('Feil ved lasting av bedrift:', error);
+    return <BusinessDetailClient initialBusiness={null} searchParams={searchParams} />;
   }
+};
+
+export default BusinessDetailPage;
+
+export interface LayoutProps {
+  children?: React.ReactNode;
+  params?: { id: string };
 }

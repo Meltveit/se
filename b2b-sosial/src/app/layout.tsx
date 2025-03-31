@@ -1,35 +1,37 @@
-"use client"
-// src/app/layout.tsx
+'use client';
+
 import React, { useEffect } from 'react';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastProvider } from '@/contexts/ToastContext';
-import { checkAndPopulateSampleData } from '@/lib/firebase/populateSampleData';
 
 const inter = Inter({ subsets: ['latin'] });
-
-// Function to initialize sample data - called client-side
-const InitSampleData = () => {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      checkAndPopulateSampleData();
-    }
-  }, []);
-  
-  return null;
-};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    const handleStaticLinkNavigate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail && customEvent.detail.path) {
+        window.location.href = customEvent.detail.path;
+      }
+    };
+
+    window.addEventListener('staticLinkNavigate', handleStaticLinkNavigate);
+    
+    return () => {
+      window.removeEventListener('staticLinkNavigate', handleStaticLinkNavigate);
+    };
+  }, []);
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Google AdSense Script */}
         <Script
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${
@@ -38,22 +40,11 @@ export default function RootLayout({
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
-        
-        {/* Media.net Script (Optional, can be added dynamically) */}
-        <Script
-          id="medianet-script"
-          strategy="afterInteractive"
-          src={`https://contextual.media.net/dmedianet.js?cid=${
-            process.env.NEXT_PUBLIC_MEDIANET_PUBLISHER_ID || ''
-          }`}
-        />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={inter.className}>
         <AuthProvider>
           <ToastProvider>
             {children}
-            {/* Only run in development mode */}
-            {process.env.NODE_ENV === 'development' && <InitSampleData />}
           </ToastProvider>
         </AuthProvider>
       </body>
