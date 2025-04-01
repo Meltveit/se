@@ -1,13 +1,11 @@
-// src/app/dashboard/profile/categories/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getBusiness, updateBusiness, updateBusinessProfileCompletion } from '@/lib/firebase/db';
-import { getCategories, getTags } from '@/lib/firebase/db';
 import { useToast } from '@/contexts/ToastContext';
-import { Business, Category, Tag } from '@/types';
+import { Business } from '@/types';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
 import Button from '@/components/common/Button';
@@ -16,6 +14,12 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ProfileCompletionSteps from '@/components/profile/ProfileCompletionSteps';
 import Select from '@/components/common/Select';
 import SearchableSelect from '@/components/common/SearchableSelect';
+import { 
+  CATEGORIES, 
+  TAGS, 
+  TagCategory, 
+  TagItem 
+} from '@/lib/geographic-data';
 import { populateCategoriesAndTags, debugCategoriesAndTags } from '@/utils/categoryPopulateUtil';
 
 export default function CategoriesAndTagsPage() {
@@ -29,33 +33,48 @@ export default function CategoriesAndTagsPage() {
   const [error, setError] = useState<string | null>(null);
   
   // Categories and Tags
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [dataPopulated, setDataPopulated] = useState(false);
-  
-  // First, make sure categories and tags exist in the database
+
+  // Category and tag options derived from imported data
+  const categoryOptions = useMemo(() => 
+    CATEGORIES.map(cat => ({ value: cat.value, label: cat.label })), 
+    []
+  );
+
+  // Dynamic tag options based on selected category
+  const tagOptions = useMemo(() => {
+    if (!selectedCategory) {
+      // If no category selected, return all tags
+      return Object.values(TAGS).flatMap(categoryTags => 
+        categoryTags.map(tag => ({ value: tag.value, label: tag.label }))
+      );
+    }
+    
+    // Return tags for the selected category
+    return TAGS[selectedCategory as TagCategory]?.map(tag => ({
+      value: tag.value,
+      label: tag.label
+    })) || [];
+  }, [selectedCategory]);
+
+  // First, make sure categories and tags exist
   useEffect(() => {
     const initializeData = async () => {
       try {
-        // Debug current state
         const debugResult = await debugCategoriesAndTags();
         
-        // If no categories or tags, populate them
         if (debugResult.categoriesCount === 0 || debugResult.tagsCount === 0) {
           console.log('Need to populate categories and/or tags');
           const result = await populateCategoriesAndTags();
           if (result.success) {
             showToast('Categories and tags data initialized successfully', 'success');
-            setDataPopulated(true);
           } else {
             console.error('Failed to populate data:', result.message);
             showToast('Error initializing data. Please refresh and try again.', 'error');
           }
         } else {
-          console.log('Categories and tags already exist in database');
-          setDataPopulated(true);
+          console.log('Categories and tags already exist');
         }
       } catch (err) {
         console.error('Error initializing data:', err);
@@ -65,50 +84,39 @@ export default function CategoriesAndTagsPage() {
     initializeData();
   }, [showToast]);
   
-  // Fetch business data, categories, and tags
+  // Fetch business data
   useEffect(() => {
-    const fetchData = async () => {
-      if (!businessId || !dataPopulated) return;
+    const fetchBusinessData = async () => {
+      if (!businessId) return;
       
       try {
         setLoading(true);
-        const [businessData, categoriesData, tagsData] = await Promise.all([
-          getBusiness(businessId),
-          getCategories(),
-          getTags()
-        ]);
-        
-        // Debug what we got from the database
-        console.log('Fetched categories:', categoriesData);
-        console.log('Fetched tags:', tagsData);
+        const businessData = await getBusiness(businessId);
         
         if (businessData) {
           setBusiness(businessData);
+          
           // Set existing category and tags if available
           if (businessData.category) {
-            console.log('Setting selected category:', businessData.category);
             setSelectedCategory(businessData.category);
           }
+          
           if (businessData.tags && businessData.tags.length > 0) {
-            console.log('Setting selected tags:', businessData.tags);
             setSelectedTags(businessData.tags);
           }
         } else {
           setError('Business not found. Please contact support.');
         }
-        
-        setCategories(categoriesData);
-        setTags(tagsData);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load data. Please try again later.');
+        console.error('Error fetching business data:', err);
+        setError('Failed to load business data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [businessId, dataPopulated]);
+    fetchBusinessData();
+  }, [businessId]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,6 +132,11 @@ export default function CategoriesAndTagsPage() {
     
     if (selectedTags.length === 0) {
       setError('Please select at least one tag');
+      return;
+    }
+    
+    if (selectedTags.length > 3) {
+      setError('You can select a maximum of 3 tags');
       return;
     }
     
@@ -169,14 +182,6 @@ export default function CategoriesAndTagsPage() {
     );
   }
 
-  // Debug what category options we have to show in the dropdown
-  const categoryOptions = categories.map(cat => ({ value: cat.id, label: cat.name }));
-  console.log('Category options:', categoryOptions);
-  
-  // Debug what tag options we have to show
-  const tagOptions = tags.map(tag => ({ value: tag.id, label: tag.name }));
-  console.log('Tag options:', tagOptions);
-
   return (
     <AuthGuard requireAuth requireBusiness>
       <DashboardLayout title="Categories and Tags">
@@ -198,9 +203,13 @@ export default function CategoriesAndTagsPage() {
                 <Select
                   id="category"
                   name="category"
-                  options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
+                  options={categoryOptions}
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    // Reset tags when category changes
+                    setSelectedTags([]);
+                  }}
                   fullWidth
                   required
                 />
@@ -213,14 +222,17 @@ export default function CategoriesAndTagsPage() {
               <div>
                 <SearchableSelect
                   label="Business Tags"
-                  options={tags.map(tag => ({ value: tag.id, label: tag.name }))}
+                  options={tagOptions}
                   selectedValues={selectedTags}
                   onChange={setSelectedTags}
                   placeholder="Search for tags..."
                   maxSelections={3}
+                  disabled={!selectedCategory}
                 />
                 <p className="text-sm text-gray-500 mt-2">
-                  Select up to 3 tags that best describe your business. These tags help potential partners and clients find you.
+                  {!selectedCategory 
+                    ? 'Select a category first to enable tag selection.' 
+                    : 'Select up to 3 tags that best describe your business. These tags help potential partners and clients find you.'}
                 </p>
               </div>
             </div>
@@ -230,18 +242,6 @@ export default function CategoriesAndTagsPage() {
                 <div className="flex">
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {(!categories || categories.length === 0) && (
-              <div className="rounded-md bg-yellow-50 p-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
-                      No categories available. Please refresh the page or contact support.
-                    </h3>
                   </div>
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default function CategoriesAndTagsPage() {
               <Button
                 type="submit"
                 isLoading={submitting}
-                disabled={submitting || !categories || categories.length === 0}
+                disabled={submitting || !selectedCategory}
               >
                 Complete Profile
               </Button>

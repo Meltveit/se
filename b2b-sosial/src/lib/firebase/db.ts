@@ -158,7 +158,6 @@ export const getFeaturedBusinesses = async (limitCount = 6): Promise<Business[]>
 // Categories and Tags
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    console.log('Fetching categories from Firestore...');
     const q = query(
       collection(db, 'categories'),
       orderBy('order', 'asc')
@@ -166,21 +165,14 @@ export const getCategories = async (): Promise<Category[]> => {
     
     const snapshot = await getDocs(q);
     
-    if (snapshot.empty) {
-      console.log('No categories found in Firestore!');
-      return [];
-    }
-    
     const categories: Category[] = [];
     snapshot.forEach((doc) => {
-      // Make sure to use the document ID as the category ID
       categories.push({
         id: doc.id,
         ...doc.data() as Omit<Category, 'id'>
       });
     });
     
-    console.log(`Successfully fetched ${categories.length} categories`);
     return categories;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -190,7 +182,6 @@ export const getCategories = async (): Promise<Category[]> => {
 
 export const getTags = async (): Promise<Tag[]> => {
   try {
-    console.log('Fetching tags from Firestore...');
     const q = query(
       collection(db, 'tags'),
       orderBy('name', 'asc')
@@ -198,21 +189,14 @@ export const getTags = async (): Promise<Tag[]> => {
     
     const snapshot = await getDocs(q);
     
-    if (snapshot.empty) {
-      console.log('No tags found in Firestore!');
-      return [];
-    }
-    
     const tags: Tag[] = [];
     snapshot.forEach((doc) => {
-      // Make sure to use the document ID as the tag ID
       tags.push({
         id: doc.id,
         ...doc.data() as Omit<Tag, 'id'>
       });
     });
     
-    console.log(`Successfully fetched ${tags.length} tags`);
     return tags;
   } catch (error) {
     console.error('Error fetching tags:', error);
@@ -493,4 +477,5 @@ export const sendMessage = async (messageData: {
     console.error('Error sending message:', error);
     throw error;
   }
+  
 };

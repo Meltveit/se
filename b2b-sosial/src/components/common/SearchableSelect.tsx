@@ -15,6 +15,7 @@ interface SearchableSelectProps {
   label?: string;
   error?: string;
   className?: string;
+  disabled?: boolean; // Add disabled prop
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -26,6 +27,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   label,
   error,
   className = '',
+  disabled = false, // Default to false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -72,6 +74,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   // Handle option selection
   const handleSelectOption = (value: string) => {
+    if (disabled) return; // Prevent selection if disabled
+
     if (selectedValues.includes(value)) {
       onChange(selectedValues.filter(v => v !== value));
     } else if (selectedValues.length < maxSelections) {
@@ -91,6 +95,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   // Remove a selected option
   const handleRemoveOption = (value: string) => {
+    if (disabled) return; // Prevent removal if disabled
     onChange(selectedValues.filter(v => v !== value));
   };
 
@@ -113,27 +118,31 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         {selectedValues.map(value => (
           <div
             key={value}
-            className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
+            className={`bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center ${
+              disabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <span>{getOptionLabel(value)}</span>
-            <button
-              type="button"
-              onClick={() => handleRemoveOption(value)}
-              className="ml-1 text-blue-800 hover:text-blue-900"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => handleRemoveOption(value)}
+                className="ml-1 text-blue-800 hover:text-blue-900"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -142,23 +151,28 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       <div className="relative">
         <input
           type="text"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+          className={`w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           placeholder={selectedValues.length < maxSelections ? placeholder : `Maximum ${maxSelections} selections`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={() => setIsOpen(true)}
-          onClick={() => setIsOpen(true)}
-          disabled={selectedValues.length >= maxSelections}
+          onFocus={() => !disabled && setIsOpen(true)}
+          onClick={() => !disabled && setIsOpen(true)}
+          disabled={disabled || selectedValues.length >= maxSelections}
           style={{ color: '#1f2937' }} /* Ensure text is visible */
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
           <button 
             type="button"
             className="focus:outline-none"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => !disabled && setIsOpen(!isOpen)}
+            disabled={disabled}
           >
             <svg
-              className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              className={`h-5 w-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''} ${
+                disabled ? 'opacity-50' : ''
+              }`}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -175,7 +189,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       </div>
 
       {/* Dropdown Options */}
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-50 mt-1 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
           <div className="py-1">
             {filteredOptions.length > 0 ? (
