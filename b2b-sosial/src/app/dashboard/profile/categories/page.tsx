@@ -18,7 +18,6 @@ import {
   CATEGORIES, 
   TAGS, 
   TagCategory, 
-  TagItem 
 } from '@/lib/geographic-data';
 import { populateCategoriesAndTags, debugCategoriesAndTags } from '@/utils/categoryPopulateUtil';
 

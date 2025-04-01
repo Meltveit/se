@@ -1,66 +1,101 @@
 // src/app/page.tsx
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getFeaturedBusinesses, getCategories, getPosts } from '@/lib/firebase/db';
 import MainLayout from '@/components/layout/MainLayout';
 import Button from '@/components/common/Button';
 import BusinessCard from '@/components/businesses/BusinessCard';
 import PostCard from '@/components/posts/PostCard';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
-import {
-  Computer,
-  DollarSign,
-  Stethoscope,
-  GraduationCap,
-  ShoppingCart,
-  Factory,
-  Briefcase,
-  Building2,
-  Film,
-  Hotel,
-  Truck,
-  Flame,
-  Leaf,
-  CupSoda,
-  Network,
-  Rocket,
-  HeartHandshake,
-  Cog,
-  Palette,
-  MoreHorizontal
-} from 'lucide-react';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { Business, Post, Category } from '@/types';
+import { categoryIcons, categoryColors, CategoryId } from '@/lib/categoryIcons';
+import { Timestamp } from 'firebase/firestore';
 
-// Define category icon mapping
-const categoryIcons = {
-  technology: Computer,
-  finance: DollarSign,
-  healthcare: Stethoscope,
-  education: GraduationCap,
-  retail: ShoppingCart,
-  manufacturing: Factory,
-  services: Briefcase,
-  construction: Building2,
-  media: Film,
-  hospitality: Hotel,
-  transportation: Truck,
-  energy: Flame,
-  agriculture: Leaf,
-  foodBeverage: CupSoda,
-  distribution: Network,
-  startup: Rocket,
-  nonprofit: HeartHandshake,
-  production: Cog,
-  creative: Palette,
-  other: MoreHorizontal
-};
+export default function HomePage() {
+  const [featuredBusinesses, setFeaturedBusinesses] = useState<Business[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Ny tilstand for valgt kategori
 
-export default async function HomePage() {
-  // Fetch featured businesses, latest posts, and categories
-  const featuredBusinesses = await getFeaturedBusinesses(6);
-  const postsData = await getPosts(3);
-  const categories = await getCategories();
+  const fallbackCategories: Category[] = [
+    { id: 'technology', name: 'Technology', slug: 'technology', order: 1, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'finance', name: 'Finance', slug: 'finance', order: 2, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'healthcare', name: 'Healthcare', slug: 'healthcare', order: 3, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'education', name: 'Education', slug: 'education', order: 4, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'retail', name: 'Retail', slug: 'retail', order: 5, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'manufacturing', name: 'Manufacturing', slug: 'manufacturing', order: 6, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'services', name: 'Services', slug: 'services', order: 7, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'construction', name: 'Construction', slug: 'construction', order: 8, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'media', name: 'Media', slug: 'media', order: 9, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'hospitality', name: 'Hospitality', slug: 'hospitality', order: 10, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'transportation', name: 'Transportation', slug: 'transportation', order: 11, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'energy', name: 'Energy', slug: 'energy', order: 12, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'agriculture', name: 'Agriculture', slug: 'agriculture', order: 13, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'foodBeverage', name: 'Food & Beverage', slug: 'food-beverage', order: 14, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'distribution', name: 'Distribution', slug: 'distribution', order: 15, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'startup', name: 'Startup', slug: 'startup', order: 16, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'nonprofit', name: 'Nonprofit', slug: 'nonprofit', order: 17, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'production', name: 'Production', slug: 'production', order: 18, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'creative', name: 'Creative', slug: 'creative', order: 19, createdAt: Timestamp.fromDate(new Date()) },
+    { id: 'other', name: 'Other', slug: 'other', order: 20, createdAt: Timestamp.fromDate(new Date()) },
+  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { getFeaturedBusinesses, getCategories, getPosts } = await import('@/lib/firebase/db');
+        const [businessesData, categoriesData, postsResult] = await Promise.all([
+          getFeaturedBusinesses(6),
+          getCategories(),
+          getPosts(3)
+        ]);
+        
+        console.log('Categories fetched:', categoriesData);
+        
+        setFeaturedBusinesses(businessesData);
+        setCategories(categoriesData.length > 0 ? categoriesData : fallbackCategories);
+        setPosts(postsResult.posts);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setCategories(fallbackCategories);
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Filtrer featuredBusinesses basert på valgt kategori
+  const filteredBusinesses = selectedCategory
+    ? featuredBusinesses.filter(business => business.category === selectedCategory)
+    : featuredBusinesses;
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    const container = document.querySelector('.categories-container');
+    if (container) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  // Håndter klikk på kategori-ikon
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId); // Toggle kategori
+  };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex justify-center items-center min-h-screen">
+          <LoadingSpinner size="lg" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -95,39 +130,54 @@ export default async function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="flex overflow-x-auto space-x-4 py-4 px-4 scrollbar-hide scroll-smooth">
+            {/* Left scroll button */}
+            <button 
+              onClick={() => handleScroll('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 p-2 rounded-full shadow-md hover:bg-white md:flex hidden items-center justify-center"
+              aria-label="Scroll left"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            {/* Categories container */}
+            <div className="categories-container flex overflow-x-auto space-x-6 py-4 px-4 scrollbar-hide snap-x snap-mandatory">
               {categories.map((category) => {
-                const Icon = categoryIcons[category.id as keyof typeof categoryIcons] || MoreHorizontal;
+                const categoryId = category.id as CategoryId;
+                const IconComponent = categoryIcons[categoryId] || categoryIcons.other;
+                const iconColor = categoryColors[categoryId] || categoryColors.other;
+                const isSelected = selectedCategory === category.id;
+
                 return (
-                  <Link
+                  <button
                     key={category.id}
-                    href={`/businesses?category=${category.id}`}
-                    className="flex-shrink-0 flex flex-col items-center cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-all duration-300 group"
+                    onClick={() => handleCategoryClick(category.id)}
+                    className={`flex-shrink-0 flex flex-col items-center justify-center w-24 p-2 rounded-lg transition duration-300 snap-start ${
+                      isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'
+                    }`}
                   >
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-200 group-hover:shadow-md transition-all duration-300">
-                      <Icon className="w-8 h-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-2 hover:bg-blue-200 transition duration-300">
+                      <IconComponent className={`h-9 w-9 ${iconColor}`} />
                     </div>
-                    <span className="text-xs text-gray-700 text-center capitalize group-hover:text-blue-800 transition-colors">
+                    <span className="text-sm text-gray-700 text-center truncate w-full">
                       {category.name}
                     </span>
-                  </Link>
+                  </button>
                 );
               })}
             </div>
-
-            {/* Scroll indicators */}
-            <div className="hidden md:block">
-              <div className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-100/50 hover:bg-gray-200/50 rounded-full p-2 cursor-pointer scroll-left-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-              <div className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-100/50 hover:bg-gray-200/50 rounded-full p-2 cursor-pointer scroll-right-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
+            
+            {/* Right scroll button */}
+            <button 
+              onClick={() => handleScroll('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 p-2 rounded-full shadow-md hover:bg-white md:flex hidden items-center justify-center"
+              aria-label="Scroll right"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -136,14 +186,18 @@ export default async function HomePage() {
       <div className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Featured Businesses</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {selectedCategory
+                ? `Featured Businesses in ${categories.find(cat => cat.id === selectedCategory)?.name}`
+                : 'Featured Businesses'}
+            </h2>
             <Link href="/businesses" className="text-blue-600 hover:text-blue-500">
               View All
             </Link>
           </div>
-          {featuredBusinesses && featuredBusinesses.length > 0 ? (
+          {filteredBusinesses && filteredBusinesses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredBusinesses.map((business) => (
+              {filteredBusinesses.map((business) => (
                 <BusinessCard
                   key={business.id}
                   business={business}
@@ -152,7 +206,11 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-              <p className="text-gray-500">No featured businesses yet. Be the first!</p>
+              <p className="text-gray-500">
+                {selectedCategory
+                  ? `No featured businesses in this category yet. Be the first!`
+                  : 'No featured businesses yet. Be the first!'}
+              </p>
               <div className="mt-4">
                 <Link href="/register/business">
                   <Button>Register Your Business</Button>
@@ -178,9 +236,9 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {postsData.posts.length > 0 ? (
+          {posts && posts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {postsData.posts.slice(0, 2).map((post) => (
+              {posts.slice(0, 2).map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
 
@@ -189,7 +247,7 @@ export default async function HomePage() {
                 <SubtleAdPlacement type="sidebar-native" className="h-full" />
               </div>
 
-              {postsData.posts.slice(2).map((post) => (
+              {posts.slice(2).map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
