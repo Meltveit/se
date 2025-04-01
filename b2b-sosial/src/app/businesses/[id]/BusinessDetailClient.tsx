@@ -8,20 +8,19 @@ import BusinessContact from '@/components/businesses/BusinessContact';
 import BusinessGallery from '@/components/businesses/BusinessGallery';
 import BusinessPostsList from '@/components/businesses/BusinessPostsList';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
 
 interface BusinessDetailClientProps {
   initialBusiness: Business | null;
-  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function BusinessDetailClient({
   initialBusiness,
-  searchParams,
 }: BusinessDetailClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Handle the case when initialBusiness is null
   if (!initialBusiness) {
     return (
       <MainLayout>
@@ -41,6 +40,8 @@ export default function BusinessDetailClient({
       </MainLayout>
     );
   }
+
+  const someQuery = searchParams.get('key'); // Eksempel, fjern eller tilpass etter behov
 
   return (
     <MainLayout>

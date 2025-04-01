@@ -1,19 +1,17 @@
-// src/app/businesses/[id]/page.tsx
-import { Metadata } from 'next';
+import { Metadata } from 'next'; // Fjernet Suspense her
+import { Suspense } from 'react'; // Importer Suspense fra 'react'
 import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
 
-// Definer PageProps med riktig type for params og searchParams som Promises
+// Definer PageProps uten searchParams
 export interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | undefined;
 }
 
 // Generer statiske parametere for statisk eksport
 export async function generateStaticParams() {
   try {
-    // Hent opptil 500 bedrifter for statisk generering
     const { businesses } = await import('@/lib/firebase/db').then(module => module.getBusinesses(500));
     return businesses.map((business) => ({
       id: business.id,
@@ -31,27 +29,20 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   try {
-    // Oppløs Promise for params
     const { id } = await params;
-
-    // Håndter placeholder-tilfellet under bygging
     if (id === 'placeholder') {
       return {
         title: 'Bedriftsprofil | B2B Social',
         description: 'Detaljer om bedriftsprofil',
       };
     }
-
-    // Hent bedriftsdata
     const business = await getBusiness(id);
-
     if (!business) {
       return {
         title: 'Bedrift Ikke Funnet',
         description: 'Den forespurte bedriftsprofilen ble ikke funnet',
       };
     }
-
     return {
       title: `${business.name} | B2B Social`,
       description: business.shortDescription || 'Detaljer om bedriftsprofil',
@@ -71,32 +62,31 @@ export async function generateMetadata({
 }
 
 // Serverkomponent for detaljsiden for bedrift
-export default async function BusinessDetailPage({ params, searchParams }: PageProps) {
+export default async function BusinessDetailPage({ params }: PageProps) {
   try {
-    // Oppløs Promise for params
     const { id } = await params;
-
-    // Oppløs Promise for searchParams hvis det finnes
-    const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-    // Håndter placeholder-tilfellet under bygging
     if (id === 'placeholder') {
-      return <BusinessDetailClient initialBusiness={null} searchParams={resolvedSearchParams} />;
+      return (
+        <Suspense fallback={<div>Loading business details...</div>}>
+          <BusinessDetailClient initialBusiness={null} />
+        </Suspense>
+      );
     }
-
-    // Hent bedriftsdata
     const business = await getBusiness(id);
-
-    // Håndter tilfelle der bedriften ikke blir funnet
     if (!business) {
       notFound();
     }
-
-    return <BusinessDetailClient initialBusiness={business} searchParams={resolvedSearchParams} />;
+    return (
+      <Suspense fallback={<div>Loading business details...</div>}>
+        <BusinessDetailClient initialBusiness={business} />
+      </Suspense>
+    );
   } catch (error) {
     console.error('Feil ved lasting av bedrift:', error);
-    // Sørg for å oppløse searchParams også i feiltilfellet
-    const resolvedSearchParams = searchParams ? await searchParams : undefined;
-    return <BusinessDetailClient initialBusiness={null} searchParams={resolvedSearchParams} />;
+    return (
+      <Suspense fallback={<div>Loading business details...</div>}>
+        <BusinessDetailClient initialBusiness={null} />
+      </Suspense>
+    );
   }
 }
