@@ -1,4 +1,6 @@
 // src/app/page.tsx
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
 import { getFeaturedBusinesses, getCategories, getPosts } from '@/lib/firebase/db';
@@ -7,19 +9,59 @@ import Button from '@/components/common/Button';
 import BusinessCard from '@/components/businesses/BusinessCard';
 import PostCard from '@/components/posts/PostCard';
 import SubtleAdPlacement from '@/components/common/SubtleAdPlacement';
+import {
+  Computer,
+  DollarSign,
+  Stethoscope,
+  GraduationCap,
+  ShoppingCart,
+  Factory,
+  Briefcase,
+  Building2,
+  Film,
+  Hotel,
+  Truck,
+  Flame,
+  Leaf,
+  CupSoda,
+  Network,
+  Rocket,
+  HeartHandshake,
+  Cog,
+  Palette,
+  MoreHorizontal
+} from 'lucide-react';
 
-// Generate static params for the homepage
-export async function generateStaticParams() {
-  return [{}]; // Empty params for the home page
-}
+// Define category icon mapping
+const categoryIcons = {
+  technology: Computer,
+  finance: DollarSign,
+  healthcare: Stethoscope,
+  education: GraduationCap,
+  retail: ShoppingCart,
+  manufacturing: Factory,
+  services: Briefcase,
+  construction: Building2,
+  media: Film,
+  hospitality: Hotel,
+  transportation: Truck,
+  energy: Flame,
+  agriculture: Leaf,
+  foodBeverage: CupSoda,
+  distribution: Network,
+  startup: Rocket,
+  nonprofit: HeartHandshake,
+  production: Cog,
+  creative: Palette,
+  other: MoreHorizontal
+};
 
-// Define the page component with no props
 export default async function HomePage() {
   // Fetch featured businesses, latest posts, and categories
   const featuredBusinesses = await getFeaturedBusinesses(6);
   const postsData = await getPosts(3);
   const categories = await getCategories();
-  
+
   return (
     <MainLayout>
       {/* Hero Section */}
@@ -39,6 +81,52 @@ export default async function HomePage() {
               <Link href="/businesses" className="text-white font-semibold">
                 Browse Businesses <span aria-hidden="true">→</span>
               </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Categories Section */}
+      <div className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Business Categories</h2>
+            <p className="mt-2 text-gray-600">Browse businesses by category</p>
+          </div>
+
+          <div className="relative">
+            <div className="flex overflow-x-auto space-x-4 py-4 px-4 scrollbar-hide scroll-smooth">
+              {categories.map((category) => {
+                const Icon = categoryIcons[category.id as keyof typeof categoryIcons] || MoreHorizontal;
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/businesses?category=${category.id}`}
+                    className="flex-shrink-0 flex flex-col items-center cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition-all duration-300 group"
+                  >
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-200 group-hover:shadow-md transition-all duration-300">
+                      <Icon className="w-8 h-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                    </div>
+                    <span className="text-xs text-gray-700 text-center capitalize group-hover:text-blue-800 transition-colors">
+                      {category.name}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Scroll indicators */}
+            <div className="hidden md:block">
+              <div className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-100/50 hover:bg-gray-200/50 rounded-full p-2 cursor-pointer scroll-left-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              <div className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-100/50 hover:bg-gray-200/50 rounded-full p-2 cursor-pointer scroll-right-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -74,53 +162,14 @@ export default async function HomePage() {
           )}
         </div>
       </div>
-      
+
       {/* Subtle ad after featured businesses */}
       <div className="container mx-auto px-4">
         <SubtleAdPlacement type="content-bottom" />
       </div>
 
-      {/* Categories Section */}
-      <div className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-gray-900">Business Categories</h2>
-            <p className="mt-2 text-gray-600">Browse businesses by category</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.slice(0, 8).map((category) => (
-              <Link
-                key={category.id}
-                href={`/businesses?category=${category.id}`}
-                className="bg-white p-4 rounded-lg shadow-sm text-center hover:shadow-md transition-shadow"
-              >
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-600">
-                  {category.icon ? (
-                    <span dangerouslySetInnerHTML={{ __html: category.icon }} />
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  )}
-                </div>
-                <h3 className="font-medium">{category.name}</h3>
-              </Link>
-            ))}
-          </div>
-
-          {categories.length > 8 && (
-            <div className="text-center mt-8">
-              <Link href="/businesses">
-                <Button variant="outline">View All Categories</Button>
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Latest Posts Section */}
-      <div className="py-12 bg-gray-50">
+      <div className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Latest Posts</h2>
@@ -128,18 +177,18 @@ export default async function HomePage() {
               View All
             </Link>
           </div>
-          
+
           {postsData.posts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {postsData.posts.slice(0, 2).map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
-              
+
               {/* Integrated ad in the feed, looks like a regular post */}
               <div className="md:col-span-1">
                 <SubtleAdPlacement type="sidebar-native" className="h-full" />
               </div>
-              
+
               {postsData.posts.slice(2).map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
@@ -169,54 +218,21 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* How It Works Section */}
-      <div className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-gray-900">How It Works</h2>
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-              B2B Social makes it easy to connect and collaborate with other businesses
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium mb-2">Create Your Profile</h3>
-              <p className="text-gray-600">Register your business and complete your profile to showcase your products or services.</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium mb-2">Connect With Businesses</h3>
-              <p className="text-gray-600">Find and follow other businesses that align with your interests and needs.</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium mb-2">Collaborate & Grow</h3>
-              <p className="text-gray-600">Share updates, message other businesses, and find new opportunities for collaboration.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Discrete footer ad */}
       <div className="container mx-auto">
         <SubtleAdPlacement type="footer-discrete" />
       </div>
+
+      {/* Scrollbar Hide Styles */}
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+      `}</style>
     </MainLayout>
   );
 }
