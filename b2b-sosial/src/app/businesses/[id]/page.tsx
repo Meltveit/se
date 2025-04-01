@@ -1,25 +1,19 @@
-// src/app/businesses/[id]/page.tsx
 import { Metadata } from 'next';
-import { getBusiness, getBusinesses } from '@/lib/firebase/db';
+import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
 import BusinessDetailClient from './BusinessDetailClient';
-import { Business } from '@/types'; // Importer Business-typen
 
-// Definer PageParams-interfacet helt øverst
-interface PageParams {
-  id: string;
+// Definer PageProps med riktig type for params og searchParams som Promises
+export interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | undefined;
 }
 
-// Definer PageProps-interfacet helt øverst
-interface PageProps {
-  params: PageParams; // Bruk PageParams-interfacet
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-// Generer statiske parametere direkte i sidefilen
+// Generer statiske parametere for statisk eksport
 export async function generateStaticParams() {
   try {
-    const { businesses } = await getBusinesses(500);
+    // Hent opptil 500 bedrifter for statisk generering
+    const { businesses } = await import('@/lib/firebase/db').then(module => module.getBusinesses(500));
     return businesses.map((business) => ({
       id: business.id,
     }));
@@ -29,23 +23,31 @@ export async function generateStaticParams() {
   }
 }
 
-// Funksjon for metadatagenerering
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+// Generer metadata for bedriftssiden
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   try {
-    // Håndter plassholder-tilfellet under bygging
-    if (params.id === 'placeholder') {
+    // Oppløs Promise for params
+    const { id } = await params;
+
+    // Håndter placeholder-tilfellet under bygging
+    if (id === 'placeholder') {
       return {
         title: 'Bedriftsprofil | B2B Social',
-        description: 'Detaljer om bedriftsprofil'
+        description: 'Detaljer om bedriftsprofil',
       };
     }
 
-    const business = await getBusiness(params.id);
+    // Hent bedriftsdata
+    const business = await getBusiness(id);
 
     if (!business) {
       return {
         title: 'Bedrift Ikke Funnet',
-        description: 'Den forespurte bedriften ble ikke funnet'
+        description: 'Den forespurte bedriftsprofilen ble ikke funnet',
       };
     }
 
@@ -62,36 +64,38 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     console.error('Feil ved generering av metadata:', error);
     return {
       title: 'Bedriftsprofil',
-      description: 'Detaljer om bedriftsprofil'
+      description: 'Detaljer om bedriftsprofil',
     };
   }
 }
 
-// Sidekomponent
-const BusinessDetailPage: React.FC<PageProps> = async ({ params, searchParams }) => {
+// Serverkomponent for detaljsiden for bedrift
+export default async function BusinessDetailPage({ params, searchParams }: PageProps) {
   try {
-    const { id } = params;
+    // Oppløs Promise for params
+    const { id } = await params;
 
+    // Oppløs Promise for searchParams hvis det finnes
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
+    // Håndter placeholder-tilfellet under bygging
     if (id === 'placeholder') {
-      return <BusinessDetailClient initialBusiness={null} searchParams={searchParams} />;
+      return <BusinessDetailClient initialBusiness={null} searchParams={resolvedSearchParams} />;
     }
 
+    // Hent bedriftsdata
     const business = await getBusiness(id);
 
+    // Håndter tilfelle der bedriften ikke blir funnet
     if (!business) {
       notFound();
     }
 
-    return <BusinessDetailClient initialBusiness={business} searchParams={searchParams} />;
+    return <BusinessDetailClient initialBusiness={business} searchParams={resolvedSearchParams} />;
   } catch (error) {
     console.error('Feil ved lasting av bedrift:', error);
-    return <BusinessDetailClient initialBusiness={null} searchParams={searchParams} />;
+    // Sørg for å oppløse searchParams også i feiltilfellet
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+    return <BusinessDetailClient initialBusiness={null} searchParams={resolvedSearchParams} />;
   }
-};
-
-export default BusinessDetailPage;
-
-export interface LayoutProps {
-  children?: React.ReactNode;
-  params?: { id: string };
 }
