@@ -1,14 +1,21 @@
 // src/components/common/RichTextEditor.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamic import React Quill with no SSR
+// Dynamically import React Quill with a different approach
+// This addresses the findDOMNode error
 const ReactQuill = dynamic(
   async () => {
-    const { default: RQ } = await import('react-quill');
-    // When we import react-quill in this way, we don't need to import CSS directly
-    return function comp({ forwardedRef, ...props }: any) {
-      return <RQ ref={forwardedRef} {...props} />;
+    // Only import in client environment
+    if (typeof window !== 'undefined') {
+      const { default: RQ } = await import('react-quill');
+      // Import CSS directly from the module (Next.js will handle this)
+      import('react-quill/dist/quill.snow.css');
+      return RQ;
+    }
+    // Return a placeholder component for server-side rendering
+    return function PlaceholderQuill(props: any) {
+      return <div className="quill-placeholder"><textarea {...props} /></div>;
     };
   },
   { ssr: false }
@@ -45,46 +52,54 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'link',
   ],
 }) => {
+  // Local state to handle editor mounting issues
+  const [mounted, setMounted] = useState(false);
+  const [editorValue, setEditorValue] = useState(value);
+  
+  // Handle client-side mounting
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      setMounted(false);
+    };
+  }, []);
+  
+  // Sync external value with local state
+  useEffect(() => {
+    if (value !== editorValue) {
+      setEditorValue(value);
+    }
+  }, [value]);
+  
+  // Handle editor changes
+  const handleChange = (content: string) => {
+    setEditorValue(content);
+    onChange(content);
+  };
+  
+  // Only render the actual editor after mounting on client
+  if (!mounted) {
+    return (
+      <div className={`rich-editor-loading ${className}`}>
+        <textarea 
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[150px]"
+          placeholder={placeholder}
+          defaultValue={value}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`rich-editor-container ${className}`}>
       <ReactQuill
         theme="snow"
-        value={value}
-        onChange={onChange}
+        value={editorValue}
+        onChange={handleChange}
         placeholder={placeholder}
         modules={modules}
         formats={formats}
       />
-      {/* Remove the ts-expect-error comment and just use the style jsx */}
-      <style jsx global>{`
-        .quill {
-          border-radius: 0.375rem;
-          border: 1px solid #e5e7eb;
-        }
-        .ql-toolbar {
-          border-top-left-radius: 0.375rem;
-          border-top-right-radius: 0.375rem;
-          border-bottom: 1px solid #e5e7eb !important;
-          background-color: #f9fafb;
-        }
-        .ql-container {
-          border-bottom-left-radius: 0.375rem;
-          border-bottom-right-radius: 0.375rem;
-          border: none !important;
-          font-family: inherit;
-          font-size: 1rem;
-          min-height: 150px;
-        }
-        .ql-editor {
-          min-height: 150px;
-          max-height: 500px;
-          overflow-y: auto;
-        }
-        .ql-editor.ql-blank::before {
-          color: #9ca3af;
-          font-style: normal;
-        }
-      `}</style>
     </div>
   );
 };

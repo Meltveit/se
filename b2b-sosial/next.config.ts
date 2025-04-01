@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['react-quill'],
   
+  // Environment variables to be set at build time
+  env: {
+    // Disable remote config during build
+    NEXT_PUBLIC_DISABLE_REMOTE_CONFIG: 'true',
+  },
+  
   webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
       // Use a type assertion to bypass the type checking
@@ -19,6 +25,9 @@ const nextConfig: NextConfig = {
         fs: false,
         net: false,
         tls: false,
+        // Add Remote Config related modules to fallback
+        'firebase-admin': false,
+        '@firebase/remote-config': false,
       };
     }
     return config;

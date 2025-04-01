@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Post } from '@/types';
 import { createPost, updatePost } from '@/lib/firebase/db';
-import { uploadPostImage } from '@/lib/firebase/storage';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
@@ -26,13 +25,6 @@ const PostForm: React.FC<PostFormProps> = ({
   const [content, setContent] = useState(existingPost?.content || '');
   const [tags, setTags] = useState<string[]>(existingPost?.tags || []);
   const [tagInput, setTagInput] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [coverImageUrl, setCoverImageUrl] = useState<string>(existingPost?.coverImage || '');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,67 +72,15 @@ const PostForm: React.FC<PostFormProps> = ({
     setIsSubmitting(true);
 
     try {
-      let postCoverImageUrl = coverImageUrl;
-      let additionalImageUrls: string[] = existingPost?.imageUrls || [];
-
-      // Upload cover image if selected
-      if (coverImage) {
-        try {
-          const fileId = existingPost?.id || 'new';
-          const imageUrl = await uploadPostImage(
-            businessId,
-            fileId,
-            coverImage,
-            0,
-            (progress) => setUploadProgress(progress)
-          );
-          postCoverImageUrl = imageUrl;
-        } catch (error) {
-          console.error('Error uploading cover image:', error);
-          showToast('Failed to upload cover image', 'error');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // Upload additional images if selected
-      if (additionalImages.length > 0) {
-        try {
-          const fileId = existingPost?.id || 'new';
-          const uploadedUrls = await Promise.all(
-            additionalImages.map((image, index) => 
-              uploadPostImage(
-                businessId, 
-                fileId, 
-                image, 
-                index + 1, 
-                (progress) => setUploadProgress(progress / additionalImages.length)
-              )
-            )
-          );
-          additionalImageUrls = [...additionalImageUrls, ...uploadedUrls];
-        } catch (error) {
-          console.error('Error uploading additional images:', error);
-          showToast('Failed to upload additional images', 'error');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       // Create/update post data
       const postData = {
         title,
         summary,
         content,
         tags,
-        coverImage: postCoverImageUrl,
-        imageUrls: additionalImageUrls,
         status: 'published' as const,
         authorId: businessId,
         businessId,
-        viewCount: existingPost?.viewCount || 0,
-        likeCount: existingPost?.likeCount || 0,
-        commentCount: existingPost?.commentCount || 0,
       };
 
       let postId;
@@ -159,12 +99,14 @@ const PostForm: React.FC<PostFormProps> = ({
       if (onSuccess) {
         onSuccess(postId);
       } else {
-        router.push(`/news-feed/${postId}`);
+        router.push(`/dashboard/posts`);
       }
     } catch (error: any) {
       console.error('Error saving post:', error);
       if (error.message === 'Maximum post frequency reached (2 posts per week)') {
         setError('You have reached the maximum post limit (2 posts per week)');
+      } else if (error.message === 'Business profile must be at least 50% complete to create posts') {
+        setError('Your business profile must be at least 50% complete to create posts');
       } else {
         setError('Failed to save post. Please try again later.');
       }
@@ -299,21 +241,6 @@ const PostForm: React.FC<PostFormProps> = ({
           {isEditing ? 'Update Post' : 'Publish Post'}
         </Button>
       </div>
-
-      {/* Upload Progress Indicator */}
-      {isSubmitting && uploadProgress > 0 && (
-        <div className="mt-4">
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-blue-600 h-2.5 rounded-full"
-              style={{ width: `${uploadProgress}%` }}
-            ></div>
-          </div>
-          <p className="text-xs text-gray-500 mt-1 text-center">
-            Uploading... {Math.round(uploadProgress)}%
-          </p>
-        </div>
-      )}
     </form>
   );
 };
