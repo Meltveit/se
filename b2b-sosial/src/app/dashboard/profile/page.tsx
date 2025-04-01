@@ -17,7 +17,8 @@ import Input from '@/components/common/Input';
 import Textarea from '@/components/common/Textarea';
 import Select from '@/components/common/Select';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { CATEGORIES, TAGS, TagCategory } from '@/lib/geographic-data';
+import SearchableSelect from '@/components/common/SearchableSelect';
+import { CATEGORIES, TAGS, TagCategory, TagItem } from '@/lib/geographic-data';
 import FileUpload, { FileUploadRef } from '@/components/common/FileUpload';
 
 export default function BusinessProfileEditPage() {
@@ -153,19 +154,6 @@ export default function BusinessProfileEditPage() {
       ...prev,
       [name]: value
     }));
-  };
-  
-  // Handle tag selection/deselection
-  const handleTagToggle = (tagValue: string) => {
-    setSelectedTags(prevTags => {
-      if (prevTags.includes(tagValue)) {
-        // Remove tag if already selected
-        return prevTags.filter(tag => tag !== tagValue);
-      } else {
-        // Add tag if not already selected (max 3 tags)
-        return prevTags.length < 3 ? [...prevTags, tagValue] : prevTags;
-      }
-    });
   };
 
   // Handle logo file selection
@@ -446,69 +434,26 @@ export default function BusinessProfileEditPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Business Tags (Select up to 3)
                 </label>
-                <div className="mt-2">
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {selectedTags.map(tag => {
-                      // Find the tag label
-                      const tagObject = availableTags.find(t => t.value === tag);
-                      const tagLabel = tagObject ? tagObject.label : tag;
-                      
-                      return (
-                        <div 
-                          key={tag} 
-                          className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                          <span>{tagLabel}</span>
-                          <button 
-                            type="button" 
-                            onClick={() => handleTagToggle(tag)}
-                            className="ml-2 text-blue-600 hover:text-blue-800"
-                          >
-                            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                              <path 
-                                fillRule="evenodd" 
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
-                                clipRule="evenodd" 
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  {formData.category ? (
-                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {availableTags.map(tag => (
-                        <div key={tag.value} className="flex items-center">
-                          <input
-                            id={`tag-${tag.value}`}
-                            type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            checked={selectedTags.includes(tag.value)}
-                            onChange={() => handleTagToggle(tag.value)}
-                            disabled={!selectedTags.includes(tag.value) && selectedTags.length >= 3}
-                          />
-                          <label 
-                            htmlFor={`tag-${tag.value}`}
-                            className="ml-2 text-sm text-gray-700"
-                          >
-                            {tag.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500 italic">
-                      Please select a category first to see available tags
-                    </p>
-                  )}
-                  
-                  <p className="mt-2 text-xs text-gray-500">
-                    Tags help potential partners find your business more easily. 
-                    Select up to 3 tags that best describe your business.
+                
+                {formData.category ? (
+                  <SearchableSelect
+                    options={availableTags}
+                    selectedValues={selectedTags}
+                    onChange={setSelectedTags}
+                    placeholder="Search and select tags..."
+                    maxSelections={3}
+                    label={`Tags for ${CATEGORIES.find(cat => cat.value === formData.category)?.label || 'selected category'}`}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500 italic">
+                    Please select a category first to see available tags
                   </p>
-                </div>
+                )}
+                
+                <p className="mt-2 text-xs text-gray-500">
+                  Tags help potential partners find your business more easily. 
+                  Select up to 3 tags that best describe your business.
+                </p>
               </div>
 
               {/* Contact Information */}
