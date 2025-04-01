@@ -104,13 +104,13 @@ export default function AboutPage() {
               We're always looking to improve our platform and welcome your feedback and suggestions.
             </p>
             <p className="text-gray-700 mb-4">
-              <strong>Email:</strong> <a href="mailto:support@b2bsocial.com" className="text-blue-600 hover:underline">support@b2bsocial.com</a>
+              <strong>Email:</strong> <a href="mailto:support@b2bsocial.com" className="text-blue-600 hover:underline">support@b2bsocial.org</a>
             </p>
             <p className="text-gray-700">
               <strong>Address:</strong><br />
               B2B Social<br />
-              123 Business Avenue<br />
-              Oslo, Norway 0150
+              Lensmannslia 4<br />
+              Asker, Norway 1386
             </p>
           </Card>
           
