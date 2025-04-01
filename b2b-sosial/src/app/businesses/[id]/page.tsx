@@ -1,3 +1,4 @@
+// src/app/businesses/[id]/page.tsx
 import { Metadata } from 'next';
 import { getBusiness } from '@/lib/firebase/db';
 import { notFound } from 'next/navigation';
