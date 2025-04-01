@@ -1,4 +1,5 @@
-import React from 'react';
+// src/components/common/AdBanner.tsx
+import React, { useEffect, useRef } from 'react';
 
 // Extend Window interface with additional properties
 declare global {
@@ -33,16 +34,70 @@ const AdBanner: React.FC<AdBannerProps> = ({
   format = 'auto',
   className = '',
 }) => {
-  // Removed unused adRef
-  React.useEffect(() => {
+  const adRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Only run in production
+    if (process.env.NODE_ENV !== 'production') return;
+    
+    // Handle Google AdSense
     if (platform === 'google' && window.adsbygoogle) {
       try {
+        // Check if the script is already loaded
+        const hasAdScript = document.querySelector('script[src*="adsbygoogle"]');
+        
+        if (!hasAdScript) {
+          // If not loaded, add the script
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${
+            process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx'
+          }`;
+          script.crossOrigin = "anonymous";
+          document.head.appendChild(script);
+        }
+        
+        // Initialize the ad
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (error) {
         console.error('Google AdSense error:', error);
       }
+    } 
+    // Handle Media.net
+    else if (platform === 'medianet') {
+      try {
+        // Check if the script is already loaded
+        const hasMediaNetScript = document.querySelector('script[src*="media.net"]');
+        
+        if (!hasMediaNetScript) {
+          // If not loaded, add the script
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://contextual.media.net/dmedianet.js?cid=' + 
+            process.env.NEXT_PUBLIC_MEDIANET_PUBLISHER_ID;
+          document.body.appendChild(script);
+        }
+        
+        // Set up Media.net properties
+        window.medianet_width = width;
+        window.medianet_height = height;
+        window.medianet_crid = adSlot;
+        window.medianet_versionId = 'test';
+        
+        // Render Media.net ad if the API is available
+        if (window.Media_NET) {
+          window.Media_NET.render();
+        }
+      } catch (error) {
+        console.error('Media.net rendering error:', error);
+      }
     }
-  }, [platform, adSlot]);
+    
+    // Cleanup function
+    return () => {
+      // No cleanup needed for AdSense as it's a global script
+    };
+  }, [platform, adSlot, width, height]);
 
   const renderGoogleAd = () => (
     <ins
@@ -69,41 +124,24 @@ const AdBanner: React.FC<AdBannerProps> = ({
     />
   );
 
-  // Load Media.net script
-  React.useEffect(() => {
-    if (platform === 'medianet') {
-      const script = document.createElement('script');
-      script.src = 'https://contextual.media.net/dmedianet.js?cid=' + 
-        process.env.NEXT_PUBLIC_MEDIANET_PUBLISHER_ID;
-      script.async = true;
-      document.body.appendChild(script);
+  // In development mode, show placeholder
+  if (process.env.NODE_ENV === 'development') {
+    return (
+      <div 
+        className={`bg-gray-100 flex items-center justify-center ${className}`}
+        style={{ 
+          width: width, 
+          height: height 
+        }}
+      >
+        <p className="text-gray-500 text-xs">Ad Placeholder: {platform} ({adSlot})</p>
+      </div>
+    );
+  }
 
-      script.onload = () => {
-        try {
-          // Safely set window properties
-          if (window) {
-            window.medianet_width = width;
-            window.medianet_height = height;
-            window.medianet_crid = adSlot;
-            window.medianet_versionId = 'test';
-            
-            if (window.Media_NET) {
-              window.Media_NET.render();
-            }
-          }
-        } catch (error) {
-          console.error('Media.net rendering error:', error);
-        }
-      };
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [platform, adSlot, width, height]);
-
+  // In production, render actual ad
   return (
-    <div className={`ad-container overflow-hidden ${className}`}>
+    <div className={`ad-container overflow-hidden ${className}`} ref={adRef}>
       {platform === 'google' ? renderGoogleAd() : renderMediaNetAd()}
     </div>
   );

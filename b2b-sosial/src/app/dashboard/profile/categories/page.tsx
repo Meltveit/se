@@ -1,4 +1,4 @@
-// Updated version of src/app/dashboard/profile/categories/page.tsx
+// src/app/dashboard/profile/categories/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -15,7 +15,8 @@ import Card from '@/components/common/Card';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ProfileCompletionSteps from '@/components/profile/ProfileCompletionSteps';
 import Select from '@/components/common/Select';
-import SearchableSelect from '@/components/common/SearchableSelect'; // Import our new component
+import SearchableSelect from '@/components/common/SearchableSelect';
+import { populateCategoriesAndTags, debugCategoriesAndTags } from '@/utils/categoryPopulateUtil';
 
 export default function CategoriesAndTagsPage() {
   const { businessId } = useAuth();
@@ -32,11 +33,42 @@ export default function CategoriesAndTagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [dataPopulated, setDataPopulated] = useState(false);
+  
+  // First, make sure categories and tags exist in the database
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        // Debug current state
+        const debugResult = await debugCategoriesAndTags();
+        
+        // If no categories or tags, populate them
+        if (debugResult.categoriesCount === 0 || debugResult.tagsCount === 0) {
+          console.log('Need to populate categories and/or tags');
+          const result = await populateCategoriesAndTags();
+          if (result.success) {
+            showToast('Categories and tags data initialized successfully', 'success');
+            setDataPopulated(true);
+          } else {
+            console.error('Failed to populate data:', result.message);
+            showToast('Error initializing data. Please refresh and try again.', 'error');
+          }
+        } else {
+          console.log('Categories and tags already exist in database');
+          setDataPopulated(true);
+        }
+      } catch (err) {
+        console.error('Error initializing data:', err);
+      }
+    };
+
+    initializeData();
+  }, [showToast]);
   
   // Fetch business data, categories, and tags
   useEffect(() => {
     const fetchData = async () => {
-      if (!businessId) return;
+      if (!businessId || !dataPopulated) return;
       
       try {
         setLoading(true);
@@ -46,11 +78,19 @@ export default function CategoriesAndTagsPage() {
           getTags()
         ]);
         
+        // Debug what we got from the database
+        console.log('Fetched categories:', categoriesData);
+        console.log('Fetched tags:', tagsData);
+        
         if (businessData) {
           setBusiness(businessData);
           // Set existing category and tags if available
-          if (businessData.category) setSelectedCategory(businessData.category);
+          if (businessData.category) {
+            console.log('Setting selected category:', businessData.category);
+            setSelectedCategory(businessData.category);
+          }
           if (businessData.tags && businessData.tags.length > 0) {
+            console.log('Setting selected tags:', businessData.tags);
             setSelectedTags(businessData.tags);
           }
         } else {
@@ -68,7 +108,7 @@ export default function CategoriesAndTagsPage() {
     };
 
     fetchData();
-  }, [businessId]);
+  }, [businessId, dataPopulated]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,6 +169,14 @@ export default function CategoriesAndTagsPage() {
     );
   }
 
+  // Debug what category options we have to show in the dropdown
+  const categoryOptions = categories.map(cat => ({ value: cat.id, label: cat.name }));
+  console.log('Category options:', categoryOptions);
+  
+  // Debug what tag options we have to show
+  const tagOptions = tags.map(tag => ({ value: tag.id, label: tag.name }));
+  console.log('Tag options:', tagOptions);
+
   return (
     <AuthGuard requireAuth requireBusiness>
       <DashboardLayout title="Categories and Tags">
@@ -187,6 +235,18 @@ export default function CategoriesAndTagsPage() {
               </div>
             )}
 
+            {(!categories || categories.length === 0) && (
+              <div className="rounded-md bg-yellow-50 p-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-yellow-800">
+                      No categories available. Please refresh the page or contact support.
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between items-center pt-4 border-t border-gray-200">
               <Button
                 type="button"
@@ -199,7 +259,7 @@ export default function CategoriesAndTagsPage() {
               <Button
                 type="submit"
                 isLoading={submitting}
-                disabled={submitting}
+                disabled={submitting || !categories || categories.length === 0}
               >
                 Complete Profile
               </Button>
