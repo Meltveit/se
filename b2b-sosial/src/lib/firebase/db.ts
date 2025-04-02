@@ -485,21 +485,17 @@ export const setFeaturedBusinessStatus = async (
   adminUserId: string
 ): Promise<void> => {
   try {
-    // Update business featured status
+    console.log('Setting featured status for business:', businessId, 'by user:', adminUserId);
+    
+    // Update business featured status in Firestore
     const businessRef = doc(db, 'businesses', businessId);
+    console.log('Attempting to update Firestore business document...');
     await updateDoc(businessRef, {
       featured: isFeatured,
       featuredAt: isFeatured ? serverTimestamp() : null,
       updatedAt: serverTimestamp()
     });
-
-    // Log action
-    await addDoc(collection(db, 'admin_logs'), {
-      action: `Set featured status to ${isFeatured}`,
-      businessId,
-      adminId: adminUserId,
-      timestamp: serverTimestamp()
-    });
+    console.log('Firestore business document updated successfully');
   } catch (error) {
     console.error('Error setting featured status:', error);
     throw error;

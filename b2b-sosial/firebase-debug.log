@@ -1,0 +1,135 @@
+[debug] [2025-04-02T20:12:37.265Z] ----------------------------------------------------------------------
+[debug] [2025-04-02T20:12:37.304Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\meltv\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-04-02T20:12:37.307Z] CLI Version:   13.35.0
+[debug] [2025-04-02T20:12:37.307Z] Platform:      win32
+[debug] [2025-04-02T20:12:37.308Z] Node Version:  v22.14.0
+[debug] [2025-04-02T20:12:37.311Z] Time:          Wed Apr 02 2025 22:12:37 GMT+0200 (Central European Summer Time)
+[debug] [2025-04-02T20:12:37.312Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-04-02T20:12:38.461Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-02T20:12:38.464Z] > authorizing via signed-in user (Christopher@b2bsocial.no)
+[debug] [2025-04-02T20:12:38.465Z] [iam] checking project b2bsocial for permissions ["cloudconfig.configs.get","cloudconfig.configs.update","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2025-04-02T20:12:38.475Z] Checked if tokens are valid: false, expires at: 1743624648900
+[debug] [2025-04-02T20:12:38.475Z] Checked if tokens are valid: false, expires at: 1743624648900
+[debug] [2025-04-02T20:12:38.476Z] > refreshing access token with scopes: []
+[debug] [2025-04-02T20:12:38.481Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-04-02T20:12:38.482Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-04-02T20:12:40.240Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-04-02T20:12:40.241Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-04-02T20:12:40.273Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions [none]
+[debug] [2025-04-02T20:12:40.274Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions x-goog-quota-user=projects/b2bsocial
+[debug] [2025-04-02T20:12:40.276Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions {"permissions":["cloudconfig.configs.get","cloudconfig.configs.update","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-04-02T20:12:42.182Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions 200
+[debug] [2025-04-02T20:12:42.182Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial:testIamPermissions {"permissions":["cloudconfig.configs.get","cloudconfig.configs.update","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-04-02T20:12:42.183Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:42.183Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:42.184Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial [none]
+[debug] [2025-04-02T20:12:42.795Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial 200
+[debug] [2025-04-02T20:12:42.795Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial {"projectId":"b2bsocial","projectNumber":"510666935896","displayName":"b2bsocial","name":"projects/b2bsocial","resources":{"hostingSite":"b2bsocial","realtimeDatabaseInstance":"b2bsocial-default-rtdb"},"state":"ACTIVE","etag":"1_982d81e3-8e5d-490c-8682-eda870075186"}
+[debug] [2025-04-02T20:12:42.797Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:42.797Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:42.797Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial [none]
+[debug] [2025-04-02T20:12:43.085Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial 200
+[debug] [2025-04-02T20:12:43.085Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/b2bsocial {"projectId":"b2bsocial","projectNumber":"510666935896","displayName":"b2bsocial","name":"projects/b2bsocial","resources":{"hostingSite":"b2bsocial","realtimeDatabaseInstance":"b2bsocial-default-rtdb"},"state":"ACTIVE","etag":"1_982d81e3-8e5d-490c-8682-eda870075186"}
+[info] 
+[info] === Deploying to 'b2bsocial'...
+[info] 
+[info] i  deploying database, storage, firestore, hosting, remoteconfig 
+[info] i  database: checking rules syntax... 
+[debug] [2025-04-02T20:12:43.102Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:43.103Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:43.104Z] >>> [apiv2][query] GET https://firebasedatabase.googleapis.com/v1beta/projects/b2bsocial/locations/-/instances/b2bsocial-default-rtdb [none]
+[debug] [2025-04-02T20:12:44.217Z] <<< [apiv2][status] GET https://firebasedatabase.googleapis.com/v1beta/projects/b2bsocial/locations/-/instances/b2bsocial-default-rtdb 200
+[debug] [2025-04-02T20:12:44.217Z] <<< [apiv2][body] GET https://firebasedatabase.googleapis.com/v1beta/projects/b2bsocial/locations/-/instances/b2bsocial-default-rtdb {"name":"projects/510666935896/locations/europe-west1/instances/b2bsocial-default-rtdb","project":"projects/510666935896","databaseUrl":"https://b2bsocial-default-rtdb.europe-west1.firebasedatabase.app","type":"DEFAULT_DATABASE","state":"ACTIVE"}
+[debug] [2025-04-02T20:12:44.219Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:44.219Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:44.220Z] >>> [apiv2][query] PUT https://b2bsocial-default-rtdb.europe-west1.firebasedatabase.app/.settings/rules.json dryRun=true
+[debug] [2025-04-02T20:12:44.220Z] >>> [apiv2][body] PUT https://b2bsocial-default-rtdb.europe-west1.firebasedatabase.app/.settings/rules.json "{\n  \"rules\": {\n    \".read\": \"auth != null\",\n    \".write\": \"auth != null\",\n    \"users\": {\n      \"$uid\": {\n        \".read\": \"$uid === auth.uid\",\n        \".write\": \"$uid === auth.uid\"\n      }\n    },\n    \"businesses\": {\n      \"$businessId\": {\n        \".read\": \"auth != null\",\n        \".write\": \"auth != null && root.child('businesses').child($businessId).child('ownerId').val() === auth.uid\"\n      }\n    },\n    \"conversations\": {\n      \"$conversationId\": {\n        \".read\": \"auth != null && root.child('conversations').child($conversationId).child('participants').val().contains(auth.uid)\",\n        \".write\": \"auth != null && root.child('conversations').child($conversationId).child('participants').val().contains(auth.uid)\"\n      }\n    },\n    \"messages\": {\n      \"$messageId\": {\n        \".read\": \"auth != null && root.child('messages').child($messageId).child('conversationId').exists() && root.child('conversations').child(root.child('messages').child($messageId).child('conversationId').val()).child('participants').val().contains(auth.uid)\",\n        \".write\": \"auth != null && (data.child('senderId').val() === auth.uid || !data.exists())\"\n      }\n    },\n    \"posts\": {\n      \".read\": \"auth != null\",\n      \"$postId\": {\n        \".write\": \"auth != null && (data.child('authorId').val() === auth.uid || !data.exists() && newData.child('authorId').val() === auth.uid)\"\n      }\n    }\n  }\n}"
+[debug] [2025-04-02T20:12:44.763Z] <<< [apiv2][status] PUT https://b2bsocial-default-rtdb.europe-west1.firebasedatabase.app/.settings/rules.json 200
+[debug] [2025-04-02T20:12:44.764Z] <<< [apiv2][body] PUT https://b2bsocial-default-rtdb.europe-west1.firebasedatabase.app/.settings/rules.json {"status":"ok"}
+[info] +  database: rules syntax for database b2bsocial-default-rtdb is valid 
+[info] i  storage: ensuring required API firebasestorage.googleapis.com is enabled... 
+[debug] [2025-04-02T20:12:44.767Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:44.768Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:44.768Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/b2bsocial/services/firebasestorage.googleapis.com [none]
+[debug] [2025-04-02T20:12:44.768Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/b2bsocial/services/firebasestorage.googleapis.com x-goog-quota-user=projects/b2bsocial
+[debug] [2025-04-02T20:12:46.036Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/b2bsocial/services/firebasestorage.googleapis.com 200
+[debug] [2025-04-02T20:12:46.036Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/b2bsocial/services/firebasestorage.googleapis.com [omitted]
+[info] +  storage: required API firebasestorage.googleapis.com is enabled 
+[debug] [2025-04-02T20:12:46.038Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:46.038Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:46.039Z] >>> [apiv2][query] GET https://firebasestorage.googleapis.com/v1alpha/projects/b2bsocial/defaultBucket [none]
+[debug] [2025-04-02T20:12:46.760Z] <<< [apiv2][status] GET https://firebasestorage.googleapis.com/v1alpha/projects/b2bsocial/defaultBucket 200
+[debug] [2025-04-02T20:12:46.760Z] <<< [apiv2][body] GET https://firebasestorage.googleapis.com/v1alpha/projects/b2bsocial/defaultBucket {"name":"projects/b2bsocial/defaultBucket","location":"EU","bucket":{"name":"projects/b2bsocial/buckets/b2bsocial.firebasestorage.app"},"storageClass":"MULTI_REGIONAL"}
+[info] i  firebase.storage: checking storage.rules for compilation errors... 
+[debug] [2025-04-02T20:12:46.766Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:46.766Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:46.766Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test [none]
+[debug] [2025-04-02T20:12:46.766Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test [omitted]
+[debug] [2025-04-02T20:12:47.942Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test 200
+[debug] [2025-04-02T20:12:47.942Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test {}
+[info] +  firebase.storage: rules file storage.rules compiled successfully 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-04-02T20:12:47.949Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:47.949Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:47.950Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test [none]
+[debug] [2025-04-02T20:12:47.950Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test [omitted]
+[debug] [2025-04-02T20:12:48.828Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test 200
+[debug] [2025-04-02T20:12:48.828Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/b2bsocial:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-04-02T20:12:48.844Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:48.845Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:48.846Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/b2bsocial/versions [none]
+[debug] [2025-04-02T20:12:48.847Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/b2bsocial/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-04-02T20:12:51.126Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/b2bsocial/versions 200
+[debug] [2025-04-02T20:12:51.127Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/b2bsocial/versions {"name":"projects/510666935896/sites/b2bsocial/versions/6a0b8a8f42738b93","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-04-02T20:12:51.129Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:51.129Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:51.130Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial [none]
+[debug] [2025-04-02T20:12:52.204Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial 200
+[debug] [2025-04-02T20:12:52.205Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/b2bsocial {"projectNumber":"510666935896","projectId":"b2bsocial","lifecycleState":"ACTIVE","name":"b2bsocial","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-03-28T20:00:45.127328Z"}
+[debug] [2025-04-02T20:12:52.206Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:52.206Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:52.207Z] >>> [apiv2][query] GET https://firebaseremoteconfig.googleapis.com/v1/projects/510666935896/remoteConfig 
+[debug] [2025-04-02T20:12:52.915Z] <<< [apiv2][status] GET https://firebaseremoteconfig.googleapis.com/v1/projects/510666935896/remoteConfig 200
+[debug] [2025-04-02T20:12:52.916Z] <<< [apiv2][body] GET https://firebaseremoteconfig.googleapis.com/v1/projects/510666935896/remoteConfig {"version":{"versionNumber":"39","updateTime":"2025-04-02T19:55:34.294454Z","updateUser":{"email":"Christopher@b2bsocial.no"},"updateOrigin":"REST_API","updateType":"INCREMENTAL_UPDATE"}}
+[debug] [2025-04-02T20:12:52.919Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:52.920Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:52.920Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases pageSize=10&pageToken=
+[debug] [2025-04-02T20:12:53.809Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases 200
+[debug] [2025-04-02T20:12:53.810Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases {"releases":[{"name":"projects/b2bsocial/releases/cloud.firestore","rulesetName":"projects/b2bsocial/rulesets/6c6082b7-b4bb-4fda-80c9-bccb2753ecad","createTime":"2025-03-28T20:10:36.831365Z","updateTime":"2025-04-02T19:55:31.802348Z"},{"name":"projects/b2bsocial/releases/firebase.storage/b2bsocial.firebasestorage.app","rulesetName":"projects/b2bsocial/rulesets/ee35065c-1108-42c6-a9a6-a51f8b295534","createTime":"2025-03-28T20:15:23.611925Z","updateTime":"2025-04-02T19:55:31.286986Z"}]}
+[debug] [2025-04-02T20:12:53.900Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:53.900Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:53.900Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/ee35065c-1108-42c6-a9a6-a51f8b295534 [none]
+[debug] [2025-04-02T20:12:54.807Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/ee35065c-1108-42c6-a9a6-a51f8b295534 200
+[debug] [2025-04-02T20:12:54.807Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/ee35065c-1108-42c6-a9a6-a51f8b295534 [omitted]
+[info] i  storage: latest version of storage.rules already up to date, skipping upload... 
+[debug] [2025-04-02T20:12:54.813Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:54.813Z] Checked if tokens are valid: true, expires at: 1743628359241
+[info] i  firestore: deploying indexes... 
+[debug] [2025-04-02T20:12:54.817Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:54.818Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:54.820Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases pageSize=10&pageToken=
+[debug] [2025-04-02T20:12:54.821Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/indexes [none]
+[debug] [2025-04-02T20:12:55.155Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/indexes 200
+[debug] [2025-04-02T20:12:55.156Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/indexes {"indexes":[{"name":"projects/b2bsocial/databases/(default)/collectionGroups/posts/indexes/CICAgLjy8IAK","queryScope":"COLLECTION","fields":[{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"},{"fieldPath":"__name__","order":"DESCENDING"}],"state":"READY","density":"SPARSE_ALL"},{"name":"projects/b2bsocial/databases/(default)/collectionGroups/posts/indexes/CICAgNiroIEK","queryScope":"COLLECTION","fields":[{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"},{"fieldPath":"name","order":"DESCENDING"},{"fieldPath":"businessId","order":"ASCENDING"},{"fieldPath":"tags","arrayConfig":"CONTAINS"},{"fieldPath":"category","order":"DESCENDING"},{"fieldPath":"__name__","order":"DESCENDING"}],"state":"READY","density":"SPARSE_ALL"},{"name":"projects/b2bsocial/databases/(default)/collectionGroups/businesses/indexes/CICAgLiIkYMK","queryScope":"COLLECTION","fields":[{"fieldPath":"category","order":"ASCENDING"},{"fieldPath":"profileCompletionStatus.completionPercentage","order":"DESCENDING"},{"fieldPath":"country","order":"ASCENDING"},{"fieldPath":"region","order":"ASCENDING"},{"fieldPath":"name","order":"ASCENDING"},{"fieldPath":"featured","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"},{"fieldPath":"__name__","order":"DESCENDING"}],"state":"READY","density":"SPARSE_ALL"},{"name":"projects/b2bsocial/databases/(default)/collectionGroups/conversations/indexes/CICAgOi3kJAK","queryScope":"COLLECTION","fields":[{"fieldPath":"participants","arrayConfig":"CONTAINS"},{"fieldPath":"updatedAt","order":"DESCENDING"},{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"__name__","order":"ASCENDING"}],"state":"READY","density":"SPARSE_ALL"},{"name":"projects/b2bsocial/databases/(default)/collectionGroups/messages/indexes/CICAgJiU25oK","queryScope":"COLLECTION","fields":[{"fieldPath":"conversationId","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"},{"fieldPath":"__name__","order":"DESCENDING"}],"state":"READY","density":"SPARSE_ALL"}]}
+[debug] [2025-04-02T20:12:55.159Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:55.160Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:55.161Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* [none]
+[debug] [2025-04-02T20:12:55.276Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* 200
+[debug] [2025-04-02T20:12:55.276Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/b2bsocial/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* {"fields":[{"name":"projects/b2bsocial/databases/(default)/collectionGroups/__default__/fields/*","indexConfig":{"indexes":[{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"ASCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"DESCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","arrayConfig":"CONTAINS"}],"state":"READY"}]}}]}
+[info] i  firestore: The following indexes are defined in your project but are not present in your firestore indexes file:
+	(posts) -- (status,ASCENDING) (createdAt,DESCENDING) 
+	(posts) -- (status,ASCENDING) (createdAt,DESCENDING) (name,DESCENDING) (businessId,ASCENDING) (tags,CONTAINS) (category,DESCENDING) 
+	(businesses) -- (category,ASCENDING) (profileCompletionStatus.completionPercentage,DESCENDING) (country,ASCENDING) (region,ASCENDING) (name,ASCENDING) (featured,ASCENDING) (createdAt,DESCENDING) 
+	(conversations) -- (participants,CONTAINS) (updatedAt,DESCENDING) (status,ASCENDING) 
+	(messages) -- (conversationId,ASCENDING) (createdAt,DESCENDING)  
+[debug] [2025-04-02T20:12:55.717Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases 200
+[debug] [2025-04-02T20:12:55.718Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/releases {"releases":[{"name":"projects/b2bsocial/releases/cloud.firestore","rulesetName":"projects/b2bsocial/rulesets/6c6082b7-b4bb-4fda-80c9-bccb2753ecad","createTime":"2025-03-28T20:10:36.831365Z","updateTime":"2025-04-02T19:55:31.802348Z"},{"name":"projects/b2bsocial/releases/firebase.storage/b2bsocial.firebasestorage.app","rulesetName":"projects/b2bsocial/rulesets/ee35065c-1108-42c6-a9a6-a51f8b295534","createTime":"2025-03-28T20:15:23.611925Z","updateTime":"2025-04-02T19:55:31.286986Z"}]}
+[debug] [2025-04-02T20:12:55.719Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:55.719Z] Checked if tokens are valid: true, expires at: 1743628359241
+[debug] [2025-04-02T20:12:55.719Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/6c6082b7-b4bb-4fda-80c9-bccb2753ecad [none]
+[debug] [2025-04-02T20:12:56.563Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/6c6082b7-b4bb-4fda-80c9-bccb2753ecad 200
+[debug] [2025-04-02T20:12:56.564Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/b2bsocial/rulesets/6c6082b7-b4bb-4fda-80c9-bccb2753ecad [omitted]
+[info] i  firestore: latest version of firestore.rules already up to date, skipping upload... 
