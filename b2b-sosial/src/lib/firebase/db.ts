@@ -485,12 +485,6 @@ export const setFeaturedBusinessStatus = async (
   adminUserId: string
 ): Promise<void> => {
   try {
-    // First, verify admin status
-    const adminDoc = await getDoc(doc(db, 'admin_users', adminUserId));
-    if (!adminDoc.exists() || adminDoc.data().role !== 'super_admin') {
-      throw new Error('Unauthorized');
-    }
-
     // Update business featured status
     const businessRef = doc(db, 'businesses', businessId);
     await updateDoc(businessRef, {
@@ -499,7 +493,7 @@ export const setFeaturedBusinessStatus = async (
       updatedAt: serverTimestamp()
     });
 
-    // Optionally log the action
+    // Log action
     await addDoc(collection(db, 'admin_logs'), {
       action: `Set featured status to ${isFeatured}`,
       businessId,
