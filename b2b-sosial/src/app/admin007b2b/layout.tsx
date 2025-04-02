@@ -1,13 +1,33 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/config';
+import { useRouter } from 'next/navigation';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+interface AdminLayoutProps {
+  children: ReactNode;
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  const router = useRouter();
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      sessionStorage.removeItem('adminSession');
+      sessionStorage.removeItem('adminUid');
+      router.push('/admin007b2b/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-blue-600 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold">B2B Social Admin</h1>
           <nav>
-            <a href="/admin007b2b/login" className="text-white hover:underline">Logg ut</a>
+            <button onClick={handleLogout} className="text-white hover:underline">Log Out</button>
           </nav>
         </div>
       </header>

@@ -14,6 +14,9 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Admin user ID - the specific admin UID
+  const adminUserId = '2pQt0csZO3cHekZZP0q1l1juUVr2'; // Admin email: christopher@b2bsocial.no
+
   // Hent bedrifter
   const fetchBusinesses = async () => {
     setLoading(true);
@@ -76,8 +79,8 @@ export default function AdminDashboardPage() {
       const business = businesses.find(b => b.id === businessId);
       if (!business) return;
 
-      // Oppdater featured status
-      await setFeaturedBusinessStatus(businessId, !business.featured);
+      // Oppdater featured status - pass the adminUserId as the third parameter
+      await setFeaturedBusinessStatus(businessId, !business.featured, adminUserId);
       
       // Oppdater lokal state
       const updatedBusinesses = businesses.map(b => 

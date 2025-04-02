@@ -10,7 +10,7 @@ export default function AboutPage() {
     <MainLayout>
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-center mb-8">About B2B Social</h1>
+          <h1 className="text-3xl font-bold text-center mb-8 text-gray-700">About B2B Social</h1>
           
           <Card className="mb-10">
             <h2 className="text-xl font-semibold mb-4">Our Mission</h2>
@@ -104,7 +104,7 @@ export default function AboutPage() {
               We're always looking to improve our platform and welcome your feedback and suggestions.
             </p>
             <p className="text-gray-700 mb-4">
-              <strong>Email:</strong> <a href="mailto:support@b2bsocial.com" className="text-blue-600 hover:underline">support@b2bsocial.org</a>
+              <strong>Email:</strong> <a href="mailto:support@b2bsocial.org" className="text-blue-600 hover:underline">support@b2bsocial.org</a>
             </p>
             <p className="text-gray-700">
               <strong>Address:</strong><br />

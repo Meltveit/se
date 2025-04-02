@@ -1,36 +1,42 @@
 'use client';
 
 import React, { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase/config';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [adminSecret, setAdminSecret] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Midlertidig autentiseringslogikk
-    // I en virkelig implementasjon ville du bruke Firebase eller annen autentiseringstjeneste
     try {
-      if (
-        email === 'admin@b2bsocial.org' && 
-        password === 'AdminPassword123!' && 
-        adminSecret === 'B2BSocialAdmin2024!'
-      ) {
-        // Vellykket innlogging
-        alert('Innlogging vellykket! Sender deg til dashbordet...');
-        // Flytt til dashbord
-        window.location.href = '/admin007b2b/dashboard';
+      // Authenticate with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Check if this user's UID is authorized (authorized UID: 2pQt0csZO3cHekZZP0q1l1juUVr2)
+      if (user.uid === '2pQt0csZO3cHekZZP0q1l1juUVr2') {
+        // Store admin session info
+        sessionStorage.setItem('adminSession', 'true');
+        sessionStorage.setItem('adminUid', user.uid);
+        
+        // Redirect to admin dashboard
+        router.push('/admin007b2b/dashboard');
       } else {
-        throw new Error('Ugyldig innloggingsinformasjon');
+        throw new Error('Ikke autorisert tilgang');
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Innlogging feilet');
+      console.error('Innloggingsfeil:', error);
+      setError('Ugyldig innloggingsinformasjon eller ikke autorisert tilgang');
     } finally {
       setIsLoading(false);
     }
@@ -68,21 +74,8 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Passord"
-              />
-            </div>
-            <div>
-              <label htmlFor="admin-secret" className="sr-only">Admin Hemmelighet</label>
-              <input
-                id="admin-secret"
-                name="admin-secret"
-                type="password"
-                required
-                value={adminSecret}
-                onChange={(e) => setAdminSecret(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Admin Hemmelighet"
+                placeholder="Passord"
               />
             </div>
           </div>
