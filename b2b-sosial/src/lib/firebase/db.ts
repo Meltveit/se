@@ -479,3 +479,35 @@ export const sendMessage = async (messageData: {
   }
   
 };
+export const setFeaturedBusinessStatus = async (
+  businessId: string, 
+  isFeatured: boolean,
+  adminUserId: string
+): Promise<void> => {
+  try {
+    // First, verify admin status
+    const adminDoc = await getDoc(doc(db, 'admin_users', adminUserId));
+    if (!adminDoc.exists() || adminDoc.data().role !== 'super_admin') {
+      throw new Error('Unauthorized');
+    }
+
+    // Update business featured status
+    const businessRef = doc(db, 'businesses', businessId);
+    await updateDoc(businessRef, {
+      featured: isFeatured,
+      featuredAt: isFeatured ? serverTimestamp() : null,
+      updatedAt: serverTimestamp()
+    });
+
+    // Optionally log the action
+    await addDoc(collection(db, 'admin_logs'), {
+      action: `Set featured status to ${isFeatured}`,
+      businessId,
+      adminId: adminUserId,
+      timestamp: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error setting featured status:', error);
+    throw error;
+  }
+};
