@@ -16,26 +16,54 @@ export default function AdminDashboardPage() {
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured' | 'not_featured'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isVerifiedAdmin, setIsVerifiedAdmin] = useState(false);
 
   const router = useRouter();
   const { showToast } = useToast();
 
   const SUPER_ADMIN_UID = '2pQt0csZO3cHekZZP0q1l1juUVr2';
 
-  const fetchBusinesses = async () => {
-    const currentUser = auth.currentUser;
-    console.log('Fetching businesses, UID:', currentUser?.uid); // Debugging
-    if (!currentUser || currentUser.uid !== SUPER_ADMIN_UID) {
-      showToast('Ingen tilgang. Kun superadmin kan se dette.', 'error');
-      router.push('/login');
-      return;
-    }
+  // Verify admin status first
+  useEffect(() => {
+    const verifyAdmin = async () => {
+      const currentUser = auth.currentUser;
+      
+      if (!currentUser) {
+        router.push('/admin007b2b/login');
+        return;
+      }
 
+      try {
+        // Force token refresh to ensure we have the latest claims
+        await currentUser.getIdToken(true);
+        
+        if (currentUser.uid !== SUPER_ADMIN_UID) {
+          console.warn('Unauthorized access attempt by:', currentUser.uid);
+          showToast('Ingen tilgang. Kun superadmin kan se dette.', 'error');
+          router.push('/');
+          return;
+        }
+        
+        setIsVerifiedAdmin(true);
+        fetchBusinesses();
+      } catch (error) {
+        console.error('Error verifying admin:', error);
+        showToast('Autentiseringsfeil', 'error');
+        router.push('/admin007b2b/login');
+      }
+    };
+
+    verifyAdmin();
+  }, [router, showToast]);
+
+  const fetchBusinesses = async () => {
+    if (!isVerifiedAdmin) return;
+    
     setLoading(true);
     setError(null);
 
     try {
-      const fetchedBusinesses = await getBusinesses(1000);
+      const fetchedBusinesses = await getBusinesses(100);
       setBusinesses(fetchedBusinesses.businesses);
       setFilteredBusinesses(fetchedBusinesses.businesses);
     } catch (err) {
@@ -47,26 +75,6 @@ export default function AdminDashboardPage() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const checkAuthAndFetchBusinesses = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        router.push('/login');
-        return;
-      }
-
-      if (currentUser.uid !== SUPER_ADMIN_UID) {
-        showToast('Ingen tilgang. Kun superadmin kan se dette.', 'error');
-        router.push('/');
-        return;
-      }
-
-      await fetchBusinesses();
-    };
-
-    checkAuthAndFetchBusinesses();
-  }, []);
 
   useEffect(() => {
     if (!businesses.length) return;
@@ -95,30 +103,31 @@ export default function AdminDashboardPage() {
   const toggleFeaturedStatus = async (businessId: string) => {
     try {
       const currentUser = auth.currentUser;
-      console.log('Toggling featured status, UID:', currentUser?.uid);
       if (!currentUser || currentUser.uid !== SUPER_ADMIN_UID) {
         throw new Error('Kun superadmin kan endre fremhevet status');
       }
-  
-      console.log('Refreshing auth token...');
-      const token = await currentUser.getIdToken(true);
-      console.log('Token refreshed, UID:', currentUser.uid, 'Token snippet:', token.slice(0, 20) + '...');
-  
+      
+      // Find the business object
       const business = businesses.find(b => b.id === businessId);
       if (!business) {
         throw new Error('Bedrift ikke funnet');
       }
-  
-      console.log('Calling setFeaturedBusinessStatus with businessId:', businessId);
-      await setFeaturedBusinessStatus(businessId, !business.featured, currentUser.uid);
       
+      // Set new featured status (toggle current value)
+      const newFeaturedStatus = !business.featured;
+      
+      // Update in Firestore
+      await setFeaturedBusinessStatus(businessId, newFeaturedStatus, currentUser.uid);
+      
+      // Update local state
       const updatedBusinesses = businesses.map(b => 
-        b.id === businessId ? { ...b, featured: !b.featured } : b
+        b.id === businessId ? { ...b, featured: newFeaturedStatus } : b
       );
       setBusinesses(updatedBusinesses);
       
+      // Show success message
       showToast(
-        `Bedrift ${business.name} er nå ${!business.featured ? 'fremhevet' : 'fjernet fra fremhevede'}`, 
+        `Bedrift ${business.name} er nå ${newFeaturedStatus ? 'fremhevet' : 'fjernet fra fremhevede'}`, 
         'success'
       );
     } catch (err) {
@@ -128,7 +137,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (loading) {
+  if (!isVerifiedAdmin || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
@@ -148,22 +157,6 @@ export default function AdminDashboardPage() {
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Prøv igjen
-        </button>
-      </div>
-    );
-  }
-
-  if (!businesses.length) {
-    return (
-      <div className="container mx-auto p-6 text-center">
-        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
-          <p>Ingen bedrifter funnet</p>
-        </div>
-        <button 
-          onClick={fetchBusinesses} 
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Last på nytt
         </button>
       </div>
     );
@@ -236,11 +229,12 @@ export default function AdminDashboardPage() {
             <div>
               <h3 className="font-bold text-gray-900 mb-2">{business.name}</h3>
               <p className="text-sm text-gray-600 mb-2">
-                {CATEGORIES.find(cat => cat.value === business.category)?.label}
+                {CATEGORIES.find(cat => cat.value === business.category)?.label || 'Ingen kategori'}
               </p>
               <div className="text-xs text-gray-500 space-y-1">
-                <p>Opprettet: {new Date(business.createdAt.toDate()).toLocaleDateString()}</p>
-                <p>Profil: {business.profileCompletionStatus.completionPercentage}% fullført</p>
+                <p>ID: {business.id}</p>
+                <p>Opprettet: {business.createdAt ? new Date(business.createdAt.toDate()).toLocaleDateString() : 'Ukjent'}</p>
+                <p>Profil: {business.profileCompletionStatus?.completionPercentage || 0}% fullført</p>
               </div>
             </div>
             

@@ -477,25 +477,34 @@ export const sendMessage = async (messageData: {
     console.error('Error sending message:', error);
     throw error;
   }
-  
 };
+
+// Set Featured Business Status
 export const setFeaturedBusinessStatus = async (
   businessId: string, 
   isFeatured: boolean,
   adminUserId: string
 ): Promise<void> => {
   try {
-    console.log('Setting featured status for business:', businessId, 'by user:', adminUserId);
+    // First, verify this is actually the admin
+    if (adminUserId !== '2pQt0csZO3cHekZZP0q1l1juUVr2') {
+      throw new Error('Unauthorized: Only super admin can update featured status');
+    }
     
-    // Update business featured status in Firestore
+    console.log('Setting featured status for business:', businessId);
+    
     const businessRef = doc(db, 'businesses', businessId);
-    console.log('Attempting to update Firestore business document...');
+    
+    // Update the business document with custom merge to ensure it works with security rules
     await updateDoc(businessRef, {
       featured: isFeatured,
       featuredAt: isFeatured ? serverTimestamp() : null,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      // Add a field that shows this was updated by the admin
+      lastModifiedBy: adminUserId
     });
-    console.log('Firestore business document updated successfully');
+    
+    console.log('Featured status updated successfully');
   } catch (error) {
     console.error('Error setting featured status:', error);
     throw error;
