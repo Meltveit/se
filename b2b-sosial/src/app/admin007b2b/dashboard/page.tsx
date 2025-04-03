@@ -102,38 +102,82 @@ export default function AdminDashboardPage() {
 
   const toggleFeaturedStatus = async (businessId: string) => {
     try {
+      // Get current user
       const currentUser = auth.currentUser;
-      if (!currentUser || currentUser.uid !== SUPER_ADMIN_UID) {
-        throw new Error('Kun superadmin kan endre fremhevet status');
+      
+      // Check authentication
+      if (!currentUser) {
+        console.error('No user is currently logged in');
+        showToast('Du må være logget inn som admin', 'error');
+        router.push('/admin007b2b/login');
+        return;
       }
+      
+      // Verify admin status by UID
+      if (currentUser.uid !== SUPER_ADMIN_UID) {
+        console.error('User is not authorized:', currentUser.uid);
+        showToast('Kun superadmin kan endre fremhevet status', 'error');
+        return;
+      }
+      
+      // Force token refresh to ensure you have the latest claims
+      await currentUser.getIdToken(true);
+      console.log('Admin token refreshed for user:', currentUser.uid);
       
       // Find the business object
       const business = businesses.find(b => b.id === businessId);
       if (!business) {
-        throw new Error('Bedrift ikke funnet');
+        showToast('Bedrift ikke funnet', 'error');
+        return;
       }
       
       // Set new featured status (toggle current value)
       const newFeaturedStatus = !business.featured;
       
-      // Update in Firestore
+      console.log(`Updating featured status for ${business.name} to ${newFeaturedStatus}`);
+      
+      // Call the function to update in Firestore
       await setFeaturedBusinessStatus(businessId, newFeaturedStatus, currentUser.uid);
       
       // Update local state
       const updatedBusinesses = businesses.map(b => 
         b.id === businessId ? { ...b, featured: newFeaturedStatus } : b
       );
+      
       setBusinesses(updatedBusinesses);
+      
+      // If we're also displaying filtered businesses, update those too
+      setFilteredBusinesses(prevFiltered => 
+        prevFiltered.map(b => 
+          b.id === businessId ? { ...b, featured: newFeaturedStatus } : b
+        )
+      );
       
       // Show success message
       showToast(
-        `Bedrift ${business.name} er nå ${newFeaturedStatus ? 'fremhevet' : 'fjernet fra fremhevede'}`, 
+        `Bedrift ${business.name} er nå ${newFeaturedStatus ? 'fremhevet' : 'fjernet fra fremhevede'}`,
         'success'
       );
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Kunne ikke endre fremhevet status';
-      console.error('Error toggling featured status:', err);
+    } catch (error) {
+      // Handle errors
+      console.error('Error toggling featured status:', error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Kunne ikke endre fremhevet status';
+      
       showToast(errorMessage, 'error');
+      
+      // If it seems like an auth error, redirect to login
+      if (
+        error instanceof Error && 
+        (error.message.includes('permission') || 
+         error.message.includes('auth') || 
+         error.message.includes('Unauthorized'))
+      ) {
+        console.log('Authentication error detected, redirecting to login');
+        router.push('/admin007b2b/login');
+      }
     }
   };
 

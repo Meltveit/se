@@ -488,23 +488,36 @@ export const setFeaturedBusinessStatus = async (
   try {
     // First, verify this is actually the admin
     if (adminUserId !== '2pQt0csZO3cHekZZP0q1l1juUVr2') {
+      console.error('Unauthorized user attempt:', adminUserId);
       throw new Error('Unauthorized: Only super admin can update featured status');
     }
     
-    console.log('Setting featured status for business:', businessId);
+    console.log(`Setting featured status for business: ${businessId} to ${isFeatured}`);
     
+    // Get business first to confirm it exists
     const businessRef = doc(db, 'businesses', businessId);
+    const businessDoc = await getDoc(businessRef);
     
-    // Update the business document with custom merge to ensure it works with security rules
-    await updateDoc(businessRef, {
+    if (!businessDoc.exists()) {
+      throw new Error(`Business with ID ${businessId} not found`);
+    }
+    
+    // Prepare update data
+    const updateData: Record<string, any> = {
       featured: isFeatured,
-      featuredAt: isFeatured ? serverTimestamp() : null,
       updatedAt: serverTimestamp(),
-      // Add a field that shows this was updated by the admin
       lastModifiedBy: adminUserId
-    });
+    };
     
-    console.log('Featured status updated successfully');
+    // Only add featuredAt if featuring (not when unfeaturing)
+    if (isFeatured) {
+      updateData.featuredAt = serverTimestamp();
+    }
+    
+    // Update the business document
+    await updateDoc(businessRef, updateData);
+    
+    console.log(`Successfully updated featured status for business ${businessId} to ${isFeatured}`);
   } catch (error) {
     console.error('Error setting featured status:', error);
     throw error;
