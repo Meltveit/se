@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase/config';
+import { auth } from '@/lib/firebase/config';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
@@ -13,18 +12,38 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Debug: Log Firebase configuration on component mount
+  useEffect(() => {
+    console.log('Firebase Auth Configuration:', {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Set' : 'Not Set',
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? 'Set' : 'Not Set',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? 'Set' : 'Not Set'
+    });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    console.log('Attempting login with email:', email);
+
     try {
-      // Authenticate with Firebase
+      // Extensive logging for authentication process
+      console.log('Starting Firebase authentication');
+      
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Check if this user's UID is authorized (authorized UID: 2pQt0csZO3cHekZZP0q1l1juUVr2)
-      if (user.uid === '2pQt0csZO3cHekZZP0q1l1juUVr2') {
+      console.log('Authentication successful');
+      console.log('User UID:', user.uid);
+      
+      // Specific admin user check
+      const SUPER_ADMIN_UID = '2pQt0csZO3cHekZZP0q1l1juUVr2';
+      
+      if (user.uid === SUPER_ADMIN_UID) {
+        console.log('Admin user verified');
+        
         // Store admin session info
         sessionStorage.setItem('adminSession', 'true');
         sessionStorage.setItem('adminUid', user.uid);
@@ -32,11 +51,34 @@ export default function AdminLoginPage() {
         // Redirect to admin dashboard
         router.push('/admin007b2b/dashboard');
       } else {
+        console.warn('Unauthorized user attempted login:', user.uid);
+        await auth.signOut(); // Sign them out if not admin
         throw new Error('Ikke autorisert tilgang');
       }
     } catch (error) {
-      console.error('Innloggingsfeil:', error);
-      setError('Ugyldig innloggingsinformasjon eller ikke autorisert tilgang');
+      console.error('Login error:', error);
+      
+      // More detailed error handling
+      if (error instanceof Error) {
+        switch (error.message) {
+          case 'Firebase: Error (auth/invalid-credential).':
+            setError('Ugyldig e-post eller passord');
+            break;
+          case 'Firebase: Error (auth/user-not-found).':
+            setError('Ingen bruker funnet med denne e-posten');
+            break;
+          case 'Firebase: Error (auth/wrong-password).':
+            setError('Feil passord');
+            break;
+          case 'Ikke autorisert tilgang':
+            setError('Kun superadmin har tilgang');
+            break;
+          default:
+            setError('En uventet feil oppstod. Kontakt support.');
+        }
+      } else {
+        setError('En uventet feil oppstod');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -130,12 +130,55 @@ export const updateBusinessProfileCompletion = async (
 };
 
 // Get featured businesses
-export const getFeaturedBusinesses = async (limitCount = 6): Promise<Business[]> => {
+export const getBusinessesForHomepage = async (
+  limitCount = 6, 
+  options: {
+    category?: string;
+    latitude?: number;
+    longitude?: number;
+    maxDistance?: number; // in kilometers
+  } = {}
+): Promise<Business[]> => {
   try {
+    const { category, latitude, longitude, maxDistance } = options;
+    
+    // Prepare base query constraints
+    const constraints: QueryConstraint[] = [];
+    
+    // Add category filter if provided
+    if (category) {
+      constraints.push(where('category', '==', category));
+    }
+    
+    // Add geospatial filtering if location is provided
+    if (latitude && longitude && maxDistance) {
+      // Note: This is a simplified approach. 
+      // Proper geospatial querying typically requires a geohash or geospatial index
+      // You might need to implement more sophisticated geospatial filtering
+      
+      // Rough approximation of latitude/longitude bounding box
+      const earthRadius = 6371; // kilometers
+      const latDelta = maxDistance / earthRadius * (180 / Math.PI);
+      const lonDelta = latDelta / Math.cos(latitude * Math.PI / 180);
+      
+      constraints.push(
+        where('location.latitude', '>=', latitude - latDelta),
+        where('location.latitude', '<=', latitude + latDelta),
+        where('location.longitude', '>=', longitude - lonDelta),
+        where('location.longitude', '<=', longitude + lonDelta)
+      );
+    }
+    
+    // Always add sorting to ensure some randomness
+    constraints.push(
+      orderBy('createdAt', 'desc'), // Recent businesses first
+      limit(limitCount)
+    );
+    
+    // Create query
     const q = query(
       collection(db, 'businesses'),
-      where('featured', '==', true),
-      limit(limitCount)
+      ...constraints
     );
     
     const snapshot = await getDocs(q);
@@ -148,9 +191,30 @@ export const getFeaturedBusinesses = async (limitCount = 6): Promise<Business[]>
       });
     });
     
+    // If we don't have enough businesses and a category was specified, 
+    // fall back to fetching from all categories
+    if (businesses.length < limitCount && category) {
+      const fallbackQ = query(
+        collection(db, 'businesses'),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount - businesses.length)
+      );
+      
+      const fallbackSnapshot = await getDocs(fallbackQ);
+      fallbackSnapshot.forEach((doc) => {
+        // Avoid duplicates
+        if (!businesses.some(b => b.id === doc.id)) {
+          businesses.push({
+            id: doc.id,
+            ...doc.data() as Omit<Business, 'id'>
+          });
+        }
+      });
+    }
+    
     return businesses;
   } catch (error) {
-    console.error('Error fetching featured businesses:', error);
+    console.error('Error fetching businesses for homepage:', error);
     throw error;
   }
 };

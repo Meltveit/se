@@ -1,5 +1,4 @@
-// src/app/page.tsx
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -12,68 +11,89 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { Business, Post, Category } from '@/types';
 import { categoryIcons, categoryColors, CategoryId } from '@/lib/categoryIcons';
 import { Timestamp } from 'firebase/firestore';
+import { CATEGORIES } from '@/lib/geographic-data';
 
 export default function HomePage() {
   const [featuredBusinesses, setFeaturedBusinesses] = useState<Business[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Ny tilstand for valgt kategori
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  const fallbackCategories: Category[] = [
-    { id: 'technology', name: 'Technology', slug: 'technology', order: 1, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'finance', name: 'Finance', slug: 'finance', order: 2, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'healthcare', name: 'Healthcare', slug: 'healthcare', order: 3, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'education', name: 'Education', slug: 'education', order: 4, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'retail', name: 'Retail', slug: 'retail', order: 5, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'manufacturing', name: 'Manufacturing', slug: 'manufacturing', order: 6, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'services', name: 'Services', slug: 'services', order: 7, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'construction', name: 'Construction', slug: 'construction', order: 8, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'media', name: 'Media', slug: 'media', order: 9, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'hospitality', name: 'Hospitality', slug: 'hospitality', order: 10, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'transportation', name: 'Transportation', slug: 'transportation', order: 11, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'energy', name: 'Energy', slug: 'energy', order: 12, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'agriculture', name: 'Agriculture', slug: 'agriculture', order: 13, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'foodBeverage', name: 'Food & Beverage', slug: 'food-beverage', order: 14, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'distribution', name: 'Distribution', slug: 'distribution', order: 15, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'startup', name: 'Startup', slug: 'startup', order: 16, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'nonprofit', name: 'Nonprofit', slug: 'nonprofit', order: 17, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'production', name: 'Production', slug: 'production', order: 18, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'creative', name: 'Creative', slug: 'creative', order: 19, createdAt: Timestamp.fromDate(new Date()) },
-    { id: 'other', name: 'Other', slug: 'other', order: 20, createdAt: Timestamp.fromDate(new Date()) },
-  ];
+  const fallbackCategories: Category[] = CATEGORIES.map(category => ({
+    id: category.value,
+    name: category.label,
+    slug: category.value,
+    order: CATEGORIES.findIndex(c => c.value === category.value) + 1,
+    createdAt: Timestamp.fromDate(new Date())
+  }));
 
+  // Fetch user's location on component mount
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.warn('Geolocation error:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    }
+  }, []);
+
+  // Fetch businesses and posts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { getFeaturedBusinesses, getCategories, getPosts } = await import('@/lib/firebase/db');
+        setIsLoading(true);
+        const { getBusinessesForHomepage, getCategories, getPosts } = await import('@/lib/firebase/db');
+        
+        // Prepare location and category options for business fetching
+        const locationOptions = userLocation 
+          ? { 
+              latitude: userLocation.latitude, 
+              longitude: userLocation.longitude, 
+              maxDistance: 100 // 100 km radius
+            } 
+          : {};
+
         const [businessesData, categoriesData, postsResult] = await Promise.all([
-          getFeaturedBusinesses(6),
+          getBusinessesForHomepage(6, {
+            ...locationOptions,
+            category: selectedCategory || undefined
+          }),
           getCategories(),
           getPosts(3)
         ]);
         
         console.log('Categories fetched:', categoriesData);
+        console.log('Businesses fetched:', businessesData);
         
         setFeaturedBusinesses(businessesData);
         setCategories(categoriesData.length > 0 ? categoriesData : fallbackCategories);
         setPosts(postsResult.posts);
-        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
         setCategories(fallbackCategories);
+      } finally {
         setIsLoading(false);
       }
     };
     
     fetchData();
-  }, []);
+  }, [selectedCategory, userLocation]);
 
-  // Filtrer featuredBusinesses basert på valgt kategori
-  const filteredBusinesses = selectedCategory
-    ? featuredBusinesses.filter(business => business.category === selectedCategory)
-    : featuredBusinesses;
-
+  // Scroll categories horizontally
   const handleScroll = (direction: 'left' | 'right') => {
     const container = document.querySelector('.categories-container');
     if (container) {
@@ -82,9 +102,9 @@ export default function HomePage() {
     }
   };
 
-  // Håndter klikk på kategori-ikon
+  // Handle category icon click
   const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId === selectedCategory ? null : categoryId); // Toggle kategori
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
   };
 
   if (isLoading) {
@@ -188,16 +208,16 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
               {selectedCategory
-                ? `Featured Businesses in ${categories.find(cat => cat.id === selectedCategory)?.name}`
-                : 'Featured Businesses'}
+                ? `Businesses in ${categories.find(cat => cat.id === selectedCategory)?.name}`
+                : (userLocation ? 'Businesses Near You' : 'Featured Businesses')}
             </h2>
             <Link href="/businesses" className="text-blue-600 hover:text-blue-500">
               View All
             </Link>
           </div>
-          {filteredBusinesses && filteredBusinesses.length > 0 ? (
+          {featuredBusinesses && featuredBusinesses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredBusinesses.map((business) => (
+              {featuredBusinesses.map((business) => (
                 <BusinessCard
                   key={business.id}
                   business={business}
@@ -208,8 +228,8 @@ export default function HomePage() {
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
               <p className="text-gray-500">
                 {selectedCategory
-                  ? `No featured businesses in this category yet. Be the first!`
-                  : 'No featured businesses yet. Be the first!'}
+                  ? `No businesses in this category yet.`
+                  : 'No businesses found. Be the first to register!'}
               </p>
               <div className="mt-4">
                 <Link href="/register/business">
