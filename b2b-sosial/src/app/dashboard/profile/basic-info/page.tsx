@@ -9,41 +9,10 @@ import { Business } from '@/types';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import AuthGuard from '@/components/auth/AuthGuard';
 import Input from '@/components/common/Input';
-import Select from '@/components/common/Select';
 import Textarea from '@/components/common/Textarea';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-
-// Industry options
-const industryOptions = [
-  { value: 'technology', label: 'Technology & IT' },
-  { value: 'finance', label: 'Finance & Banking' },
-  { value: 'healthcare', label: 'Healthcare & Medical' },
-  { value: 'education', label: 'Education & Training' },
-  { value: 'retail', label: 'Retail & E-commerce' },
-  { value: 'manufacturing', label: 'Manufacturing & Industry' },
-  { value: 'services', label: 'Professional Services' },
-  { value: 'construction', label: 'Construction & Real Estate' },
-  { value: 'media', label: 'Media & Entertainment' },
-  { value: 'hospitality', label: 'Hospitality & Tourism' },
-  { value: 'transport', label: 'Transportation & Logistics' },
-  { value: 'energy', label: 'Energy & Utilities' },
-  { value: 'agriculture', label: 'Agriculture & Farming' },
-  { value: 'nonprofit', label: 'Non-profit & NGO' },
-  { value: 'other', label: 'Other' },
-];
-
-// Business type options
-const businessTypeOptions = [
-  { value: 'corporation', label: 'Corporation' },
-  { value: 'llc', label: 'Limited Liability Company (LLC)' },
-  { value: 'partnership', label: 'Partnership' },
-  { value: 'soleProprietorship', label: 'Sole Proprietorship' },
-  { value: 'cooperative', label: 'Cooperative' },
-  { value: 'nonprofit', label: 'Non-profit Organization' },
-  { value: 'other', label: 'Other' },
-];
 
 export default function BasicInfoPage() {
   const { businessId } = useAuth();
@@ -55,12 +24,11 @@ export default function BasicInfoPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Form state
+  // Form state (removed category)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     shortDescription: '',
-    category: '',
     yearFounded: '',
     employeeCount: '',
     businessType: '',
@@ -81,7 +49,6 @@ export default function BasicInfoPage() {
             name: businessData.name || '',
             description: businessData.description || '',
             shortDescription: businessData.shortDescription || '',
-            category: businessData.category || '',
             yearFounded: businessData.yearFounded?.toString() || '',
             employeeCount: businessData.employeeCount?.toString() || '',
             businessType: businessData.businessType || '',
@@ -101,7 +68,7 @@ export default function BasicInfoPage() {
   }, [businessId]);
 
   // Handle form changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -130,7 +97,6 @@ export default function BasicInfoPage() {
         name: formData.name,
         description: formData.description,
         shortDescription: formData.shortDescription,
-        category: formData.category,
         yearFounded: formData.yearFounded ? parseInt(formData.yearFounded) : undefined,
         employeeCount: formData.employeeCount ? parseInt(formData.employeeCount) : undefined,
         businessType: formData.businessType,
@@ -234,16 +200,6 @@ export default function BasicInfoPage() {
                 hint="A brief one or two-sentence summary of your business. This will appear in search results and listings."
               />
 
-              <Select
-                label="Industry / Category"
-                id="category"
-                name="category"
-                options={industryOptions}
-                value={formData.category}
-                onChange={handleChange}
-                fullWidth
-              />
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="Year Founded"
@@ -269,16 +225,6 @@ export default function BasicInfoPage() {
                   min={1}
                 />
               </div>
-
-              <Select
-                label="Business Type / Legal Structure"
-                id="businessType"
-                name="businessType"
-                options={businessTypeOptions}
-                value={formData.businessType}
-                onChange={handleChange}
-                fullWidth
-              />
             </div>
 
             {error && (

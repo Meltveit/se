@@ -19,7 +19,6 @@ import {
   TAGS, 
   TagCategory, 
 } from '@/lib/geographic-data';
-import { populateCategoriesAndTags, debugCategoriesAndTags } from '@/utils/categoryPopulateUtil';
 
 export default function CategoriesAndTagsPage() {
   const { businessId } = useAuth();
@@ -56,32 +55,6 @@ export default function CategoriesAndTagsPage() {
       label: tag.label
     })) || [];
   }, [selectedCategory]);
-
-  // First, make sure categories and tags exist
-  useEffect(() => {
-    const initializeData = async () => {
-      try {
-        const debugResult = await debugCategoriesAndTags();
-        
-        if (debugResult.categoriesCount === 0 || debugResult.tagsCount === 0) {
-          console.log('Need to populate categories and/or tags');
-          const result = await populateCategoriesAndTags();
-          if (result.success) {
-            showToast('Categories and tags data initialized successfully', 'success');
-          } else {
-            console.error('Failed to populate data:', result.message);
-            showToast('Error initializing data. Please refresh and try again.', 'error');
-          }
-        } else {
-          console.log('Categories and tags already exist');
-        }
-      } catch (err) {
-        console.error('Error initializing data:', err);
-      }
-    };
-
-    initializeData();
-  }, [showToast]);
   
   // Fetch business data
   useEffect(() => {

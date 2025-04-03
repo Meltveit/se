@@ -51,7 +51,7 @@ const AdBanner: React.FC<AdBannerProps> = ({
           const script = document.createElement('script');
           script.async = true;
           script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${
-            process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx'
+            process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-2602658229657216'
           }`;
           script.crossOrigin = "anonymous";
           document.head.appendChild(script);

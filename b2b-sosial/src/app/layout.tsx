@@ -23,7 +23,7 @@ export default function RootLayout({
     };
 
     window.addEventListener('staticLinkNavigate', handleStaticLinkNavigate);
-    
+
     return () => {
       window.removeEventListener('staticLinkNavigate', handleStaticLinkNavigate);
     };
@@ -43,29 +43,18 @@ export default function RootLayout({
           crossOrigin="anonymous"
           onLoad={() => {
             console.log('Google AdSense script loaded successfully');
-            // Attempt to push the first ad configuration
+            // Kombiner initialiseringen og aktiveringen av sideannonser her
             try {
-              (window.adsbygoogle = window.adsbygoogle || []).push({});
+              (window.adsbygoogle = window.adsbygoogle || []).push({
+                google_ad_client: `${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx'}`,
+                enable_page_level_ads: true,
+              });
             } catch (error) {
               console.error('Error initializing AdSense:', error);
             }
           }}
           onError={(error) => {
             console.error('Failed to load Google AdSense script:', error);
-          }}
-        />
-        
-        {/* Optional: Add additional AdSense configuration scripts if needed */}
-        <Script
-          id="adsense-config"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (adsbygoogle = window.adsbygoogle || []).push({
-                google_ad_client: "${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || 'ca-pub-xxxxxxxxxxxxxxxx'}",
-                enable_page_level_ads: true
-              });
-            `
           }}
         />
       </head>
