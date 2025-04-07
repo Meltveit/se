@@ -4,14 +4,10 @@ import { storage, db } from './config';
 
 // Helper function to extract path from Firebase Storage URL
 function extractPathFromUrl(url: string): string {
-  // Skip if it's not a URL
   if (!url.startsWith('http')) {
     return url;
   }
-  
   try {
-    // For Firebase Storage URLs
-    // Format: https://firebasestorage.googleapis.com/v0/b/[project-id].appspot.com/o/[path]?[query]
     const urlObj = new URL(url);
     const path = urlObj.pathname.split('/o/')[1];
     if (path) {
@@ -20,8 +16,6 @@ function extractPathFromUrl(url: string): string {
   } catch (e) {
     console.error('Error parsing URL:', e);
   }
-  
-  // Return original if we can't parse it
   return url;
 }
 
@@ -68,13 +62,9 @@ export const uploadFile = async (
 // Delete a file from Firebase Storage
 export const deleteFile = async (url: string): Promise<void> => {
   if (!url) return;
-  
   try {
-    // Extract path from the URL
     const path = extractPathFromUrl(url);
-    // Create a reference to the file
     const fileRef = ref(storage, path);
-    // Delete the file
     await deleteObject(fileRef);
     console.log('File deleted successfully:', path);
   } catch (error) {
@@ -90,35 +80,24 @@ export const uploadBusinessLogo = async (
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   try {
-    // 1. Get reference to the business to find existing logo URL
     const businessRef = doc(db, 'businesses', businessId);
     const businessSnapshot = await getDoc(businessRef);
     const businessData = businessSnapshot.exists() ? businessSnapshot.data() : null;
     const oldLogoUrl = businessData?.logoUrl;
-    
-    // 2. Generate path for the new logo
     const fileExtension = file.name.split('.').pop() || 'png';
     const path = `businesses/${businessId}/logo.${fileExtension}`;
-    
-    // 3. Upload the new logo
     const newLogoUrl = await uploadFile(file, path, onProgress);
-    
-    // 4. Update the business record with the new logo URL
     await updateDoc(businessRef, {
       logoUrl: newLogoUrl,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
-    // 5. Delete the old logo if it exists and is different from new one
     if (oldLogoUrl && oldLogoUrl !== newLogoUrl) {
       try {
         await deleteFile(oldLogoUrl);
       } catch (deleteError) {
         console.error('Error deleting old logo:', deleteError);
-        // Continue even if deletion fails
       }
     }
-    
     return newLogoUrl;
   } catch (error) {
     console.error('Error uploading logo:', error);
@@ -133,35 +112,24 @@ export const uploadBusinessBanner = async (
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   try {
-    // 1. Get reference to the business to find existing banner URL
     const businessRef = doc(db, 'businesses', businessId);
     const businessSnapshot = await getDoc(businessRef);
     const businessData = businessSnapshot.exists() ? businessSnapshot.data() : null;
     const oldBannerUrl = businessData?.bannerUrl;
-    
-    // 2. Generate path for the new banner
     const fileExtension = file.name.split('.').pop() || 'jpg';
     const path = `businesses/${businessId}/banner.${fileExtension}`;
-    
-    // 3. Upload the new banner
     const newBannerUrl = await uploadFile(file, path, onProgress);
-    
-    // 4. Update the business record with the new banner URL
     await updateDoc(businessRef, {
       bannerUrl: newBannerUrl,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
-    // 5. Delete the old banner if it exists and is different from new one
     if (oldBannerUrl && oldBannerUrl !== newBannerUrl) {
       try {
         await deleteFile(oldBannerUrl);
       } catch (deleteError) {
         console.error('Error deleting old banner:', deleteError);
-        // Continue even if deletion fails
       }
     }
-    
     return newBannerUrl;
   } catch (error) {
     console.error('Error uploading banner:', error);
@@ -213,34 +181,25 @@ export const updateBusinessGallery = async (
   newGalleryUrls: string[]
 ): Promise<void> => {
   try {
-    // 1. Get reference to the business to find existing gallery URLs
     const businessRef = doc(db, 'businesses', businessId);
     const businessSnapshot = await getDoc(businessRef);
-    
     if (!businessSnapshot.exists()) {
       throw new Error('Business not found');
     }
-    
     const businessData = businessSnapshot.data();
     const oldGalleryUrls = businessData.gallery || [];
-    
-    // 2. Update the business record with the new gallery
     await updateDoc(businessRef, {
       gallery: newGalleryUrls,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
-    
-    // 3. Find URLs that exist in old gallery but not in new gallery
-    const urlsToDelete = oldGalleryUrls.filter((url: string) => !newGalleryUrls.includes(url));
-    
-    // 4. Delete each removed image
-    for (const url of urlsToDelete) {
+
+    // Delete old gallery images that are not in the new gallery
+    const removedUrls = oldGalleryUrls.filter((url: string) => !newGalleryUrls.includes(url));
+    for (const url of removedUrls) {
       try {
         await deleteFile(url);
-        console.log(`Deleted gallery image: ${url}`);
-      } catch (deleteError) {
-        console.error(`Error deleting gallery image ${url}:`, deleteError);
-        // Continue even if individual deletion fails
+      } catch (error) {
+        console.error('Error deleting old gallery image:', error);
       }
     }
   } catch (error) {

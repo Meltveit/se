@@ -243,7 +243,17 @@ export default function HomePage() {
 
       {/* Subtle ad after featured businesses */}
       <div className="container mx-auto px-4">
-        <SubtleAdPlacement type="content-bottom" />
+          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2602658229657216"
+              crossOrigin="anonymous"></script>
+          <ins className="adsbygoogle"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-2602658229657216"
+              data-ad-slot="3582927879"
+              data-ad-format="auto"
+              data-full-width-responsive="true"></ins>
+          <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
       </div>
 
       {/* Latest Posts Section */}
@@ -307,8 +317,8 @@ export default function HomePage() {
           display: none;
         }
         .scrollbar-hide {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         }
       `}</style>
     </MainLayout>
