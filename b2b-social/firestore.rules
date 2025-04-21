@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Common function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is the owner of a business
+    function isBusinessOwner(businessId) {
+      return request.auth.uid == businessId;
+    }
+    
+    // Check if user has admin rights for a business
+    function isBusinessAdmin(businessId) {
+      return request.auth.uid == businessId || 
+        exists(/databases/$(database)/documents/businesses/$(businessId)/admins/$(request.auth.uid));
+    }
+    
+    // Users collection rules
+    match /users/{userId} {
+      // Users can only read/write their own data
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Businesses collection rules
+    match /businesses/{businessId} {
+      // Anyone can read business data
+      allow read: if true;
+      
+      // Only business owner/admin can update business data
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && isBusinessAdmin(businessId);
+      allow delete: if isAuthenticated() && isBusinessOwner(businessId);
+      
+      // Admins subcollection
+      match /admins/{adminId} {
+        allow read: if isAuthenticated() && isBusinessAdmin(businessId);
+        allow write: if isAuthenticated() && isBusinessOwner(businessId);
+      }
+    }
+    
+    // Posts collection rules
+    match /posts/{postId} {
+      // Anyone can read posts
+      allow read: if true;
+      
+      // Only business owner/admin can create/update/delete posts
+      allow create: if isAuthenticated() && isBusinessAdmin(resource.data.businessId);
+      allow update: if isAuthenticated() && isBusinessAdmin(resource.data.businessId);
+      allow delete: if isAuthenticated() && isBusinessAdmin(resource.data.businessId);
+    }
+    
+    // Messages collection rules
+    match /messages/{messageId} {
+      // Only message participants can read/write messages
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId || 
+        request.auth.uid == resource.data.receiverId
+      );
+      
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.senderId;
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId || 
+        request.auth.uid == resource.data.receiverId
+      );
+      
+      allow delete: if false; // Don't allow message deletion for audit trail
+    }
+    
+    // Conversations collection rules
+    match /conversations/{conversationId} {
+      // Only participants can read/write conversations
+      allow read: if isAuthenticated() && request.auth.uid in resource.data.participants;
+      allow create: if isAuthenticated() && request.auth.uid in request.resource.data.participants;
+      allow update: if isAuthenticated() && request.auth.uid in resource.data.participants;
+      allow delete: if false; // Don't allow conversation deletion
+    }
+    
+    // Categories and tags are public read-only
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false; // Only admins can modify via Firebase console
+    }
+    
+    match /tags/{tagId} {
+      allow read: if true;
+      allow write: if false; // Only admins can modify via Firebase console
+    }
+    
+    // Countries and regions are public read-only reference data
+    match /countries/{countryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /regions/{regionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Analytics data
+    match /analytics/{analyticsId} {
+      allow read: if isAuthenticated() && isBusinessAdmin(analyticsId);
+      allow write: if false; // Updated via Cloud Functions only
+    }
+  }
+}
